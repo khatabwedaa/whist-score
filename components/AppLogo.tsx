@@ -1,6 +1,6 @@
 /**
  * Whist Score - App Logo Component
- * Simple joker card emoji on dark gray background
+ * Ford-style elegant "W" typography on dark navy background
  */
 
 import React from "react";
@@ -12,9 +12,9 @@ interface AppLogoProps {
 
 export function AppLogo({ size = "md" }: AppLogoProps) {
   const dimensions = {
-    sm: { container: 48, fontSize: 28, borderRadius: 10 },
-    md: { container: 80, fontSize: 48, borderRadius: 16 },
-    lg: { container: 120, fontSize: 72, borderRadius: 24 },
+    sm: { container: 48, fontSize: 32, borderRadius: 11 },
+    md: { container: 80, fontSize: 52, borderRadius: 18 },
+    lg: { container: 120, fontSize: 78, borderRadius: 26 },
   }[size];
 
   return (
@@ -28,19 +28,23 @@ export function AppLogo({ size = "md" }: AppLogoProps) {
         },
       ]}
     >
-      <Text style={[styles.emoji, { fontSize: dimensions.fontSize }]}>🃏</Text>
+      <Text style={[styles.letter, { fontSize: dimensions.fontSize }]}>W</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#0f172a", // gray-950
+    backgroundColor: "#0f172a",
     alignItems: "center",
     justifyContent: "center",
   },
-  emoji: {
+  letter: {
+    color: "#ffffff",
+    fontWeight: "300",
+    fontStyle: "italic",
     textAlign: "center",
+    marginTop: -4,
   },
 });
 

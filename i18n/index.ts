@@ -58,18 +58,30 @@ const translations = {
   deleteGameConfirm: "متأكد عايز تحذف اللعبة دي؟",
 
   // Rounds
-  round: "شوته",
-  rounds: "الشوتات",
-  addRound: "أضف شوته",
-  editRound: "عدل الشوته",
-  deleteRound: "احذف الشوته",
-  deleteRoundConfirm: "متأكد عايز تحذف الشوته دي؟",
-  noRounds: "ما في شوتات",
-  noRoundsDescription: "أضف شوته عشان تبدأ تحسب النقاط",
-  roundNumber: "الشوته {{number}}",
-  maxRounds: "عدد الشوتات",
-  maxRoundsDescription: "عدد الشوتات في اللعبة (افتح للعبة بدون حد)",
+  round: "شوطة",
+  rounds: "الشوطات",
+  addRound: "أضف شوطة",
+  editRound: "عدل الشوطة",
+  deleteRound: "احذف الشوطة",
+  deleteRoundConfirm: "متأكد عايز تحذف الشوطة دي؟",
+  noRounds: "ما في شوطات",
+  noRoundsDescription: "أضف شوطة عشان تبدأ تحسب النقاط",
+  roundNumber: "الشوطة {{number}}",
+  maxRounds: "عدد الشوطات",
+  maxRoundsDescription: "عدد الشوطات في اللعبة (افتح للعبة بدون حد)",
   unlimitedRounds: "بدون حد",
+
+  // Arabic ordinal round names
+  roundOrdinal1: "الشوطة الأولى",
+  roundOrdinal2: "الشوطة الثانية",
+  roundOrdinal3: "الشوطة الثالثة",
+  roundOrdinal4: "الشوطة الرابعة",
+  roundOrdinal5: "الشوطة الخامسة",
+  roundOrdinal6: "الشوطة السادسة",
+  roundOrdinal7: "الشوطة السابعة",
+  roundOrdinal8: "الشوطة الثامنة",
+  roundOrdinal9: "الشوطة التاسعة",
+  roundOrdinal10: "الشوطة العاشرة",
 
   // Game Over
   gameOver: "انتهت اللعبة",
@@ -157,6 +169,30 @@ export function t(
   }
 
   return text;
+}
+
+/**
+ * Get ordinal round name in Arabic (الشوطة الأولى، الثانية، etc.)
+ */
+export function getRoundOrdinalName(roundNumber: number): string {
+  const ordinalKeys: TranslationKey[] = [
+    "roundOrdinal1",
+    "roundOrdinal2",
+    "roundOrdinal3",
+    "roundOrdinal4",
+    "roundOrdinal5",
+    "roundOrdinal6",
+    "roundOrdinal7",
+    "roundOrdinal8",
+    "roundOrdinal9",
+    "roundOrdinal10",
+  ];
+
+  if (roundNumber >= 1 && roundNumber <= 10) {
+    return translations[ordinalKeys[roundNumber - 1]];
+  }
+  // For rounds > 10, use numeric format
+  return `${t("round")} ${roundNumber}`;
 }
 
 /**

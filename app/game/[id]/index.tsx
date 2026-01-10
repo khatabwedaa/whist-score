@@ -9,11 +9,13 @@ import {
   Modal,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { NumberInput } from "../../../components";
 import { t } from "../../../i18n";
 import { useGames } from "../../../lib/context";
 import { getLeadingTeam } from "../../../lib/scoring";
@@ -23,6 +25,7 @@ import {
   getGame,
   reopenGame,
   undoLastRound,
+  updateGameSettings,
 } from "../../../lib/storage";
 import { colors, spacing, typography } from "../../../lib/theme";
 import { Game } from "../../../lib/types";
@@ -34,6 +37,9 @@ export default function GameDetailScreen() {
 
   const [game, setGame] = useState<Game | null>(null);
   const [showGameOverModal, setShowGameOverModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [tempMaxRounds, setTempMaxRounds] = useState(4);
+  const [tempUnlimitedRounds, setTempUnlimitedRounds] = useState(false);
 
   const loadGame = useCallback(async () => {
     if (!id) return;
@@ -121,6 +127,26 @@ export default function GameDetailScreen() {
     await refreshGames();
   };
 
+  const handleOpenSettings = () => {
+    setTempMaxRounds(game.settings.maxRounds || 4);
+    setTempUnlimitedRounds(!game.settings.maxRounds);
+    setShowSettingsModal(true);
+  };
+
+  const handleSaveSettings = async () => {
+    try {
+      await updateGameSettings(id, {
+        maxRounds: tempUnlimitedRounds ? undefined : tempMaxRounds,
+      });
+      await loadGame();
+      await refreshGames();
+      setShowSettingsModal(false);
+    } catch (error) {
+      console.error("Error updating settings:", error);
+      Alert.alert(t("error"), String(error));
+    }
+  };
+
   const handleDeleteGame = () => {
     Alert.alert(t("deleteGame"), t("deleteGameConfirm"), [
       { text: t("cancel"), style: "cancel" },
@@ -206,17 +232,101 @@ export default function GameDetailScreen() {
         </View>
       </Modal>
 
+      {/* Settings Modal */}
+      <Modal
+        visible={showSettingsModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowSettingsModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.settingsModalContent}>
+            <Text style={styles.settingsModalTitle}>{t("gameSettings")}</Text>
+
+            {/* Max Rounds Setting */}
+            <View style={styles.settingRow}>
+              <View style={styles.settingLabelRow}>
+                <Text style={styles.settingLabel}>{t("maxRounds")}</Text>
+                <View style={styles.unlimitedToggle}>
+                  <Text style={styles.unlimitedLabel}>
+                    {t("unlimitedRounds")}
+                  </Text>
+                  <Switch
+                    value={tempUnlimitedRounds}
+                    onValueChange={setTempUnlimitedRounds}
+                    trackColor={{
+                      false: colors.surface.tertiary,
+                      true: "#0ea5e9",
+                    }}
+                    thumbColor="#ffffff"
+                  />
+                </View>
+              </View>
+              {!tempUnlimitedRounds && (
+                <View style={styles.numberInputContainer}>
+                  <NumberInput
+                    value={tempMaxRounds}
+                    onChange={setTempMaxRounds}
+                    min={Math.max(game.rounds.length, 1)}
+                    max={20}
+                    step={1}
+                  />
+                </View>
+              )}
+              <Text style={styles.settingDescription}>
+                {t("maxRoundsDescription")}
+              </Text>
+              {game.rounds.length > 0 &&
+                !tempUnlimitedRounds &&
+                tempMaxRounds < game.rounds.length && (
+                  <Text style={styles.settingWarning}>
+                    لا يمكن تقليل عدد الشوطات عن {game.rounds.length}
+                  </Text>
+                )}
+            </View>
+
+            {/* Action Buttons */}
+            <View style={styles.settingsModalActions}>
+              <TouchableOpacity
+                style={styles.settingsModalCancelBtn}
+                onPress={() => setShowSettingsModal(false)}
+              >
+                <Text style={styles.settingsModalCancelText}>
+                  {t("cancel")}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.settingsModalSaveBtn}
+                onPress={handleSaveSettings}
+              >
+                <Text style={styles.settingsModalSaveText}>{t("save")}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.closeBtn}>
           <Text style={styles.closeBtnText}>✕</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>
-          {game.date}
+          {game.settings.maxRounds
+            ? `${game.rounds.length}/${game.settings.maxRounds} ${t("rounds")}`
+            : `${game.rounds.length} ${t("rounds")}`}
         </Text>
-        <TouchableOpacity onPress={handleDeleteGame} style={styles.deleteBtn}>
-          <Text style={styles.deleteBtnText}>🗑</Text>
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            onPress={handleOpenSettings}
+            style={styles.settingsBtn}
+          >
+            <Text style={styles.settingsBtnText}>⚙️</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleDeleteGame} style={styles.deleteBtn}>
+            <Text style={styles.deleteBtnText}>🗑</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView
@@ -224,68 +334,90 @@ export default function GameDetailScreen() {
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        {/* Main Score Display - Baloot Style */}
+        {/* Main Score Display - Elegant Design with Team Names */}
         <View style={styles.scoreSection}>
-          {/* Team Labels */}
-          <View style={styles.teamLabels}>
-            <Text style={styles.teamLabel}>{t("us")}</Text>
-            <Text style={styles.teamLabel}>{t("them")}</Text>
-          </View>
-
-          {/* Score Row with Arrow */}
-          <View style={styles.scoreRow}>
+          {/* Score Cards Row */}
+          <View style={styles.scoreCardsRow}>
+            {/* Team A Card */}
             <View
               style={[
-                styles.scoreBox,
-                leadingTeam === "A" && styles.scoreBoxWinning,
+                styles.teamCard,
+                leadingTeam === "A" && styles.teamCardWinning,
               ]}
             >
               <Text
                 style={[
-                  styles.scoreText,
-                  leadingTeam === "A" && styles.scoreTextWinning,
+                  styles.teamCardName,
+                  leadingTeam === "A" && styles.teamCardNameWinning,
+                ]}
+              >
+                {game.teamAName || t("us")}
+              </Text>
+              <Text
+                style={[
+                  styles.teamCardScore,
+                  leadingTeam === "A" && styles.teamCardScoreWinning,
                 ]}
               >
                 {game.totalScoreTeamA}
               </Text>
-            </View>
-
-            <View style={styles.arrowContainer}>
-              {leadingTeam === "A" ? (
-                <Text style={styles.arrow}>→</Text>
-              ) : leadingTeam === "B" ? (
-                <Text style={styles.arrow}>←</Text>
-              ) : (
-                <Text style={styles.arrowNeutral}>-</Text>
+              {leadingTeam === "A" && !game.isFinished && (
+                <View style={styles.leadingBadge}>
+                  <Text style={styles.leadingBadgeText}>{t("leading")}</Text>
+                </View>
               )}
             </View>
 
+            {/* VS Divider */}
+            <View style={styles.vsDivider}>
+              <Text style={styles.vsText}>{t("vs")}</Text>
+            </View>
+
+            {/* Team B Card */}
             <View
               style={[
-                styles.scoreBox,
-                leadingTeam === "B" && styles.scoreBoxWinning,
+                styles.teamCard,
+                leadingTeam === "B" && styles.teamCardWinning,
               ]}
             >
               <Text
                 style={[
-                  styles.scoreText,
-                  leadingTeam === "B" && styles.scoreTextWinning,
+                  styles.teamCardName,
+                  leadingTeam === "B" && styles.teamCardNameWinning,
+                ]}
+              >
+                {game.teamBName || t("them")}
+              </Text>
+              <Text
+                style={[
+                  styles.teamCardScore,
+                  leadingTeam === "B" && styles.teamCardScoreWinning,
                 ]}
               >
                 {game.totalScoreTeamB}
               </Text>
+              {leadingTeam === "B" && !game.isFinished && (
+                <View style={styles.leadingBadge}>
+                  <Text style={styles.leadingBadgeText}>{t("leading")}</Text>
+                </View>
+              )}
             </View>
           </View>
 
-          {/* Finished Banner */}
+          {/* Finished Banner with Winner */}
           {game.isFinished && (
-            <View style={styles.finishedBanner}>
-              <Text style={styles.finishedText}>
+            <View style={styles.winnerBanner}>
+              <Text style={styles.winnerEmoji}>🏆</Text>
+              <Text style={styles.winnerTitle}>{t("gameOver")}</Text>
+              <Text style={styles.winnerTeamName}>
                 {leadingTeam === "A"
-                  ? `🏆 ${t("us")} ${t("winner")}!`
+                  ? game.teamAName || t("us")
                   : leadingTeam === "B"
-                  ? `🏆 ${t("them")} ${t("winner")}!`
-                  : t("finished")}
+                  ? game.teamBName || t("them")
+                  : t("tied")}
+              </Text>
+              <Text style={styles.winnerSubtitle}>
+                {leadingTeam ? t("winner") : ""}
               </Text>
             </View>
           )}
@@ -296,11 +428,15 @@ export default function GameDetailScreen() {
           <View style={styles.historySection}>
             <Text style={styles.sectionTitle}>{t("rounds")}</Text>
 
-            {/* Table Header */}
+            {/* Table Header with Team Names */}
             <View style={styles.tableHeader}>
               <Text style={styles.tableHeaderText}>#</Text>
-              <Text style={styles.tableHeaderText}>{t("us")}</Text>
-              <Text style={styles.tableHeaderText}>{t("them")}</Text>
+              <Text style={styles.tableHeaderText}>
+                {game.teamAName || t("us")}
+              </Text>
+              <Text style={styles.tableHeaderText}>
+                {game.teamBName || t("them")}
+              </Text>
             </View>
 
             {/* Table Rows */}
@@ -311,17 +447,23 @@ export default function GameDetailScreen() {
                   style={[
                     styles.tableCell,
                     round.scoreTeamA > round.scoreTeamB && styles.tableCellWin,
+                    round.scoreTeamA < 0 && styles.tableCellLoss,
                   ]}
                 >
-                  {round.scoreTeamA}
+                  {round.scoreTeamA > 0
+                    ? `+${round.scoreTeamA}`
+                    : round.scoreTeamA}
                 </Text>
                 <Text
                   style={[
                     styles.tableCell,
                     round.scoreTeamB > round.scoreTeamA && styles.tableCellWin,
+                    round.scoreTeamB < 0 && styles.tableCellLoss,
                   ]}
                 >
-                  {round.scoreTeamB}
+                  {round.scoreTeamB > 0
+                    ? `+${round.scoreTeamB}`
+                    : round.scoreTeamB}
                 </Text>
               </View>
             ))}
@@ -329,8 +471,22 @@ export default function GameDetailScreen() {
             {/* Total Row */}
             <View style={styles.tableTotalRow}>
               <Text style={styles.tableTotalLabel}>{t("total")}</Text>
-              <Text style={styles.tableTotalCell}>{game.totalScoreTeamA}</Text>
-              <Text style={styles.tableTotalCell}>{game.totalScoreTeamB}</Text>
+              <Text
+                style={[
+                  styles.tableTotalCell,
+                  leadingTeam === "A" && styles.tableTotalCellWin,
+                ]}
+              >
+                {game.totalScoreTeamA}
+              </Text>
+              <Text
+                style={[
+                  styles.tableTotalCell,
+                  leadingTeam === "B" && styles.tableTotalCellWin,
+                ]}
+              >
+                {game.totalScoreTeamB}
+              </Text>
             </View>
           </View>
         )}
@@ -338,7 +494,7 @@ export default function GameDetailScreen() {
         {/* Empty State */}
         {game.rounds.length === 0 && !game.isFinished && (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>🃏</Text>
+            <Text style={styles.emptyIcon}>🎴</Text>
             <Text style={styles.emptyText}>{t("noRounds")}</Text>
             <Text style={styles.emptySubtext}>{t("noRoundsDescription")}</Text>
           </View>
@@ -450,6 +606,11 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     textAlign: "center",
   },
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+  },
   deleteBtn: {
     width: 44,
     height: 44,
@@ -468,73 +629,101 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
 
-  // Score Section
+  // Score Section - New Elegant Design
   scoreSection: {
     marginBottom: spacing.xl,
   },
-  teamLabels: {
+  scoreCardsRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: spacing.xl,
-    marginBottom: spacing.md,
-  },
-  teamLabel: {
-    fontSize: typography.size.xl,
-    fontWeight: typography.weight.bold,
-    color: colors.text.secondary,
-  },
-  scoreRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    alignItems: "stretch",
     justifyContent: "center",
-    gap: spacing.lg,
+    gap: spacing.md,
   },
-  scoreBox: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
+  teamCard: {
+    flex: 1,
     backgroundColor: colors.surface.secondary,
+    borderRadius: 20,
+    padding: spacing.lg,
     alignItems: "center",
-    justifyContent: "center",
     borderWidth: 2,
     borderColor: colors.border.primary,
+    minHeight: 140,
+    justifyContent: "center",
   },
-  scoreBoxWinning: {
+  teamCardWinning: {
     backgroundColor: "#16a34a",
     borderColor: "#22c55e",
   },
-  scoreText: {
-    fontSize: 42,
+  teamCardName: {
+    fontSize: typography.size.lg,
+    fontWeight: typography.weight.semibold,
+    color: colors.text.secondary,
+    marginBottom: spacing.sm,
+    textAlign: "center",
+  },
+  teamCardNameWinning: {
+    color: "#ffffff",
+    opacity: 0.9,
+  },
+  teamCardScore: {
+    fontSize: 48,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
   },
-  scoreTextWinning: {
+  teamCardScoreWinning: {
     color: "#ffffff",
   },
-  arrowContainer: {
-    width: 50,
-    alignItems: "center",
-  },
-  arrow: {
-    fontSize: 32,
-    color: "#22c55e",
-  },
-  arrowNeutral: {
-    fontSize: 32,
-    color: colors.text.muted,
-  },
-  finishedBanner: {
-    marginTop: spacing.lg,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-    backgroundColor: "#16a34a",
+  leadingBadge: {
+    marginTop: spacing.sm,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
     borderRadius: 12,
-    alignItems: "center",
   },
-  finishedText: {
+  leadingBadgeText: {
+    fontSize: typography.size.xs,
+    color: "#ffffff",
+    fontWeight: typography.weight.semibold,
+  },
+  vsDivider: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: spacing.sm,
+  },
+  vsText: {
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
-    color: "#ffffff",
+    color: colors.text.muted,
+  },
+  winnerBanner: {
+    marginTop: spacing.xl,
+    paddingVertical: spacing.xl,
+    paddingHorizontal: spacing.lg,
+    backgroundColor: colors.surface.secondary,
+    borderRadius: 20,
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#fbbf24",
+  },
+  winnerEmoji: {
+    fontSize: 48,
+    marginBottom: spacing.sm,
+  },
+  winnerTitle: {
+    fontSize: typography.size.lg,
+    fontWeight: typography.weight.semibold,
+    color: colors.text.muted,
+    marginBottom: spacing.xs,
+  },
+  winnerTeamName: {
+    fontSize: typography.size["2xl"],
+    fontWeight: typography.weight.bold,
+    color: "#fbbf24",
+  },
+  winnerSubtitle: {
+    fontSize: typography.size.base,
+    color: colors.text.secondary,
+    marginTop: spacing.xs,
   },
 
   // History Section
@@ -580,6 +769,9 @@ const styles = StyleSheet.create({
     color: "#22c55e",
     fontWeight: typography.weight.bold,
   },
+  tableCellLoss: {
+    color: "#ef4444",
+  },
   tableTotalRow: {
     flexDirection: "row",
     paddingVertical: spacing.md,
@@ -601,6 +793,9 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
     textAlign: "center",
+  },
+  tableTotalCellWin: {
+    color: "#22c55e",
   },
 
   // Empty State
@@ -769,6 +964,109 @@ const styles = StyleSheet.create({
   modalButtonText: {
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
+    color: "#ffffff",
+  },
+
+  // Settings Button
+  settingsBtn: {
+    width: 44,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.surface.primary,
+    borderRadius: 12,
+  },
+  settingsBtnText: {
+    fontSize: 20,
+  },
+
+  // Settings Modal
+  settingsModalContent: {
+    backgroundColor: colors.surface.primary,
+    borderRadius: 24,
+    padding: spacing.xl,
+    width: "100%",
+    maxWidth: 340,
+  },
+  settingsModalTitle: {
+    fontSize: typography.size.xl,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
+    textAlign: "center",
+    marginBottom: spacing.xl,
+  },
+  settingRow: {
+    marginBottom: spacing.lg,
+  },
+  settingLabelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: spacing.sm,
+  },
+  settingLabel: {
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.semibold,
+    color: colors.text.primary,
+  },
+  unlimitedToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    backgroundColor: colors.surface.secondary,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: 12,
+  },
+  unlimitedLabel: {
+    fontSize: typography.size.sm,
+    color: colors.text.secondary,
+  },
+  numberInputContainer: {
+    backgroundColor: colors.surface.secondary,
+    borderRadius: 16,
+    padding: spacing.sm,
+  },
+  settingDescription: {
+    fontSize: typography.size.sm,
+    color: colors.text.muted,
+    marginTop: spacing.xs,
+    textAlign: "center",
+  },
+  settingWarning: {
+    fontSize: typography.size.sm,
+    color: "#f59e0b",
+    marginTop: spacing.sm,
+    textAlign: "center",
+    fontWeight: typography.weight.medium,
+  },
+  settingsModalActions: {
+    flexDirection: "row",
+    gap: spacing.md,
+    marginTop: spacing.xl,
+  },
+  settingsModalCancelBtn: {
+    flex: 1,
+    paddingVertical: spacing.md,
+    borderRadius: 16,
+    backgroundColor: colors.surface.secondary,
+    alignItems: "center",
+  },
+  settingsModalCancelText: {
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.semibold,
+    color: colors.text.secondary,
+  },
+  settingsModalSaveBtn: {
+    flex: 1,
+    paddingVertical: spacing.md,
+    borderRadius: 16,
+    backgroundColor: "#0ea5e9",
+    alignItems: "center",
+  },
+  settingsModalSaveText: {
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.semibold,
     color: "#ffffff",
   },
 });

@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollPicker } from "../../../components";
-import { t } from "../../../i18n";
+import { getRoundOrdinalName, t } from "../../../i18n";
 import { useGames } from "../../../lib/context";
 import { calculateRoundScore } from "../../../lib/scoring";
 import { addRound, getGame } from "../../../lib/storage";
@@ -138,7 +138,7 @@ export default function AddRoundScreen() {
           <Text style={styles.closeBtnText}>✕</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
-          {t("round")} {game.rounds.length + 1}
+          {getRoundOrdinalName(game.rounds.length + 1)}
         </Text>
         <View style={styles.headerSpacer} />
       </View>
