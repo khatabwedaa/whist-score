@@ -66,7 +66,7 @@ export const colors = {
 
   // Borders
   border: {
-    primary: "#1f2937", // gray-800
+    primary: "#111827", // gray-800
     secondary: "#374151", // gray-700
     accent: "#4b5563", // gray-600
   },

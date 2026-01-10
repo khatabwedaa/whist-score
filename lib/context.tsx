@@ -53,7 +53,8 @@ export function useLanguage() {
 interface GamesContextType {
   games: Game[];
   isLoading: boolean;
-  refreshGames: () => Promise<void>;
+  isRefreshing: boolean;
+  refreshGames: (showLoading?: boolean) => Promise<void>;
   updateGamesState: (games: Game[]) => void;
 }
 
@@ -62,12 +63,16 @@ const GamesContext = createContext<GamesContextType | undefined>(undefined);
 export function GamesProvider({ children }: { children: React.ReactNode }) {
   const [games, setGames] = useState<Game[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const refreshGames = useCallback(async () => {
-    setIsLoading(true);
+  const refreshGames = useCallback(async (showLoading = false) => {
+    if (showLoading) {
+      setIsRefreshing(true);
+    }
     const loaded = await loadGames();
     setGames(loaded);
     setIsLoading(false);
+    setIsRefreshing(false);
   }, []);
 
   const updateGamesState = useCallback((newGames: Game[]) => {
@@ -80,7 +85,7 @@ export function GamesProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <GamesContext.Provider
-      value={{ games, isLoading, refreshGames, updateGamesState }}
+      value={{ games, isLoading, isRefreshing, refreshGames, updateGamesState }}
     >
       {children}
     </GamesContext.Provider>

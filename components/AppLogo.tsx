@@ -12,9 +12,9 @@ interface AppLogoProps {
 
 export function AppLogo({ size = "md" }: AppLogoProps) {
   const dimensions = {
-    sm: { container: 48, fontSize: 32, borderRadius: 11 },
-    md: { container: 80, fontSize: 52, borderRadius: 18 },
-    lg: { container: 120, fontSize: 78, borderRadius: 26 },
+    sm: { container: 48, fontSize: 28, borderRadius: 10 },
+    md: { container: 80, fontSize: 48, borderRadius: 16 },
+    lg: { container: 120, fontSize: 72, borderRadius: 24 },
   }[size];
 
   return (
@@ -28,7 +28,7 @@ export function AppLogo({ size = "md" }: AppLogoProps) {
         },
       ]}
     >
-      <Text style={[styles.letter, { fontSize: dimensions.fontSize }]}>W</Text>
+      <Text style={[styles.emoji, { fontSize: dimensions.fontSize }]}>🃏</Text>
     </View>
   );
 }
@@ -39,12 +39,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  letter: {
-    color: "#ffffff",
-    fontWeight: "300",
-    fontStyle: "italic",
+  emoji: {
     textAlign: "center",
-    marginTop: -4,
   },
 });
 
