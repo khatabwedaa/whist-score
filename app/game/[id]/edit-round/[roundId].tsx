@@ -83,10 +83,8 @@ export default function EditRoundScreen() {
     );
   }
 
-  const teamAPlayers = game.players.filter((p) => p.team === "A");
-  const teamBPlayers = game.players.filter((p) => p.team === "B");
-  const teamAName = teamAPlayers.map((p) => p.name).join(" & ") || t("teamA");
-  const teamBName = teamBPlayers.map((p) => p.name).join(" & ") || t("teamB");
+  const teamAName = game.teamAName || t("teamA");
+  const teamBName = game.teamBName || t("teamB");
 
   // Calculate preview scores
   const roundInput: RoundInput = {

@@ -1,5 +1,5 @@
 /**
- * West Score - Add Round Screen (Simplified Baloot-style)
+ * Whist Score - Add Round Screen
  */
 
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";

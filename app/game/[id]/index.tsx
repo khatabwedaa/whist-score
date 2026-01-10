@@ -1,5 +1,5 @@
 /**
- * West Score - Game Details Screen (Minimal Baloot-style Design)
+ * Whist Score - Game Details Screen
  */
 
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";

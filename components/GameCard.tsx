@@ -41,17 +41,9 @@ export function GameCard({ game, onPress }: GameCardProps) {
     });
   };
 
-  // Get team names
-  const teamAPlayers = game.players.filter((p) => p.team === "A");
-  const teamBPlayers = game.players.filter((p) => p.team === "B");
-  const teamAName =
-    teamAPlayers.length > 0
-      ? teamAPlayers.map((p) => p.name).join(" & ")
-      : t("teamA");
-  const teamBName =
-    teamBPlayers.length > 0
-      ? teamBPlayers.map((p) => p.name).join(" & ")
-      : t("teamB");
+  // Get team names - now using teamAName/teamBName directly
+  const teamAName = game.teamAName || t("teamA");
+  const teamBName = game.teamBName || t("teamB");
 
   return (
     <Card onPress={onPress} style={styles.card} variant="elevated" padding="md">

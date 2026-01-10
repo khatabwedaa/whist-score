@@ -1,15 +1,16 @@
 /**
- * West Score - Arabic Only i18n
+ * Whist Score - Arabic Only i18n
  * App is Arabic only with RTL support
  */
 
 import { I18nManager } from "react-native";
 
-// Arabic translations
+// Arabic translations - Sudanese dialect
 const translations = {
   // App
-  appName: "حاسب ويست",
-  appTagline: "حاسب نقاط الويست السوداني",
+  appName: "ويست سكور",
+  appNameEn: "Whist Score",
+  appTagline: "حاسبة نقاط الويست السوداني",
 
   // Common
   save: "حفظ",
@@ -23,7 +24,7 @@ const translations = {
   no: "لا",
   ok: "تمام",
   loading: "جاري التحميل...",
-  error: "غلط",
+  error: "خطأ",
   success: "تمام",
   undo: "تراجع",
   calculate: "احسب",
@@ -33,34 +34,26 @@ const translations = {
   them: "لهم",
   teamA: "لنا",
   teamB: "لهم",
+  teamAName: "اسم الفريق الأول",
+  teamBName: "اسم الفريق الثاني",
   team: "فريق",
   teams: "الفرق",
   declarer: "الداخل",
   opponent: "الخصم",
 
-  // Players
-  player: "لاعب",
-  players: "اللاعبين",
-  player1: "اللاعب 1",
-  player2: "اللاعب 2",
-  player3: "اللاعب 3",
-  player4: "اللاعب 4",
-  playerName: "اسم اللاعب",
-
   // Game
   game: "لعبة",
   games: "الألعاب",
   newGame: "لعبة جديدة",
-  newRound: "صكة جديدة",
   createGame: "ابدأ لعبة",
   gameTitle: "اسم اللعبة",
   gameNote: "ملاحظة (اختياري)",
   noGames: "ما في ألعاب",
-  noGamesDescription: "اضغط الزر تحت عشان تبدأ لعبة جديدة",
+  noGamesDescription: "اضغط الزر عشان تبدأ لعبة جديدة",
   inProgress: "شغالة",
   finished: "خلصت",
   finishGame: "خلص اللعبة",
-  reopenGame: "ارجع افتح اللعبة",
+  reopenGame: "افتح اللعبة",
   deleteGame: "احذف اللعبة",
   deleteGameConfirm: "متأكد عايز تحذف اللعبة دي؟",
 
@@ -92,20 +85,12 @@ const translations = {
   // Settings
   settings: "الإعدادات",
   gameSettings: "إعدادات اللعبة",
-  globalSettings: "الإعدادات العامة",
-  language: "اللغة",
-  languageDescription: "التطبيق يدعم العربية فقط",
-  arabic: "العربية",
-  english: "English",
-  theme: "الشكل",
-  darkMode: "الوضع الغامق",
-  lightMode: "الوضع الفاتح",
 
   // Statistics
   statistics: "الإحصائيات",
-  wins: "عدد الإنتصارات",
-  losses: "عدد الهزائم",
-  draws: "عدد الصكات",
+  wins: "الإنتصارات",
+  losses: "الهزائم",
+  totalRounds: "مجموع الصكات",
   overallLevel: "المستوى العام",
   beginner: "مبتدئ",
   amateur: "هاوي",
@@ -115,8 +100,6 @@ const translations = {
   // Game Settings
   targetScore: "النقاط المطلوبة",
   targetScoreDescription: "اللعبة بتخلص لمن فريق يوصل للنقاط دي",
-  roundsLimit: "حد الصكات",
-  roundsLimitDescription: "أكتر عدد صكات (اختياري)",
   failMode: "حساب المزايدة الفاشلة",
   failModeDescription: "كيف تتحسب النقاط لمن الداخل ما يجيب مزايدتو",
   failMode_minusBid_opponentZero: "الداخل -مزايدة، الخصم 0",
@@ -124,39 +107,27 @@ const translations = {
   failMode_minusBid_opponentDifference: "الداخل -مزايدة، الخصم +الفرق",
   bonusAllTricks: "بونص كل الأكلات",
   bonusAllTricksDescription: "بونص لمن تاخد كل الـ 13 أكلة",
-  bonusSeik: "بونص السيك",
-  bonusSeikDescription: 'بونص حالة "السيك" الخاصة',
   minBid: "أقل مزايدة",
   maxBid: "أعلى مزايدة",
-  daqAlWalad: "دق الولد",
+
+  // Date/Time
+  today: "اليوم",
+  yesterday: "أمس",
+
+  // Statistics
+  draws: "التعادلات",
 
   // Validation
   required: "الحقل دا مطلوب",
   invalidBid: "المزايدة لازم تكون بين {{min}} و {{max}}",
   invalidTricks: "الأكلات لازم تكون بين 0 و 13",
   tricksMustEqual13: "مجموع الأكلات لازم يساوي 13",
-  enterGameTitle: "رجاءً دخل اسم اللعبة",
-  enterPlayerNames: "رجاءً دخل أسماء كل اللاعبين",
-
-  // Confirmation
-  unsavedChanges: "عندك تغييرات ما اتحفظت",
-  discardChanges: "تتجاهل التغييرات؟",
-
-  // Empty states
-  startPlaying: "ابدأ اللعب",
-  getStarted: "يلا نبدأ",
-
-  // Dates
-  createdOn: "اتعملت في",
-  lastPlayed: "آخر لعب",
-  today: "اليوم",
-  yesterday: "أمس",
 
   // About
   about: "عن التطبيق",
   version: "النسخة",
   aboutDescription:
-    "حاسب ويست هو دفتر نقاط رقمي للويست السوداني. تابع النقاط، احفظ الألعاب، واستمتع!",
+    "ويست سكور - حاسبة نقاط الويست السوداني. تابع النقاط واستمتع!",
 } as const;
 
 export type TranslationKey = keyof typeof translations;
@@ -188,13 +159,6 @@ export function applyRTL(): void {
     I18nManager.allowRTL(true);
     I18nManager.forceRTL(true);
   }
-}
-
-/**
- * Check if RTL is enabled (always true for Arabic only app)
- */
-export function isRTL(): boolean {
-  return true;
 }
 
 export { translations };

@@ -1,7 +1,8 @@
 /**
- * West Score - Components Index
+ * Whist Score - Components Index
  */
 
+export { AppLogo } from "./AppLogo";
 export { Button } from "./Button";
 export { Card } from "./Card";
 export { EmptyState } from "./EmptyState";

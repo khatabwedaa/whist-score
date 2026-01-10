@@ -24,7 +24,6 @@ function RootLayoutContent() {
       >
         <Stack.Screen name="index" />
         <Stack.Screen name="new-game" />
-        <Stack.Screen name="statistics" />
         <Stack.Screen name="game/[id]" />
         <Stack.Screen
           name="game/[id]/add-round"

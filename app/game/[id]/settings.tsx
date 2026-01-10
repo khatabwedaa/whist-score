@@ -1,5 +1,5 @@
 /**
- * West Score - Game Settings Screen
+ * Whist Score - Game Settings Screen (Simplified)
  */
 
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
@@ -22,14 +22,11 @@ export default function GameSettingsScreen() {
   const [game, setGame] = useState<Game | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Form state
+  // Form state - simplified
   const [title, setTitle] = useState("");
   const [note, setNote] = useState("");
   const [targetScore, setTargetScore] = useState(25);
-  const [roundsLimit, setRoundsLimit] = useState(0);
   const [failMode, setFailMode] = useState<FailMode>("minusBid_opponentTricks");
-  const [bonusAllTricks, setBonusAllTricks] = useState(0);
-  const [bonusSeik, setBonusSeik] = useState(0);
 
   const loadGame = useCallback(async () => {
     if (!id) return;
@@ -40,10 +37,7 @@ export default function GameSettingsScreen() {
       setTitle(loaded.title);
       setNote(loaded.note || "");
       setTargetScore(loaded.settings.targetScore || 25);
-      setRoundsLimit(loaded.settings.roundsLimit || 0);
       setFailMode(loaded.settings.failMode);
-      setBonusAllTricks(loaded.settings.bonusAllTricks || 0);
-      setBonusSeik(loaded.settings.bonusSeik || 0);
     }
   }, [id]);
 
@@ -65,7 +59,7 @@ export default function GameSettingsScreen() {
 
   const handleSave = async () => {
     if (!title.trim()) {
-      Alert.alert(t("error"), t("enterGameTitle"));
+      Alert.alert(t("error"), t("required"));
       return;
     }
 
@@ -81,10 +75,7 @@ export default function GameSettingsScreen() {
       // Update settings (this will recalculate scores)
       await updateGameSettings(id, {
         targetScore: targetScore > 0 ? targetScore : undefined,
-        roundsLimit: roundsLimit > 0 ? roundsLimit : undefined,
         failMode,
-        bonusAllTricks: bonusAllTricks > 0 ? bonusAllTricks : undefined,
-        bonusSeik: bonusSeik > 0 ? bonusSeik : undefined,
       });
 
       await refreshGames();
@@ -178,19 +169,7 @@ export default function GameSettingsScreen() {
             step={5}
           />
           <Text style={[styles.description, isRTL && styles.textRTL]}>
-            {t("targetScoreDescription")} (0 = {t("no")} limit)
-          </Text>
-
-          <NumberInput
-            label={t("roundsLimit")}
-            value={roundsLimit}
-            onChange={setRoundsLimit}
-            min={0}
-            max={100}
-            step={1}
-          />
-          <Text style={[styles.description, isRTL && styles.textRTL]}>
-            {t("roundsLimitDescription")} (0 = {t("no")} limit)
+            {t("targetScoreDescription")} (0 = {t("no")})
           </Text>
         </Card>
 
@@ -215,41 +194,10 @@ export default function GameSettingsScreen() {
           ))}
         </Card>
 
-        {/* Bonuses */}
-        <Card style={styles.section}>
-          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
-            Bonuses
-          </Text>
-
-          <NumberInput
-            label={t("bonusAllTricks")}
-            value={bonusAllTricks}
-            onChange={setBonusAllTricks}
-            min={0}
-            max={50}
-            step={1}
-          />
-          <Text style={[styles.description, isRTL && styles.textRTL]}>
-            {t("bonusAllTricksDescription")} (0 = disabled)
-          </Text>
-
-          <NumberInput
-            label={t("bonusSeik")}
-            value={bonusSeik}
-            onChange={setBonusSeik}
-            min={0}
-            max={50}
-            step={1}
-          />
-          <Text style={[styles.description, isRTL && styles.textRTL]}>
-            {t("bonusSeikDescription")} (0 = disabled)
-          </Text>
-        </Card>
-
         {game.rounds.length > 0 && (
           <Card style={styles.warningCard}>
             <Text style={[styles.warningText, isRTL && styles.textRTL]}>
-              ⚠️ Changing settings will recalculate all round scores
+              ⚠️ تغيير الإعدادات سيعيد حساب كل الصكات
             </Text>
           </Card>
         )}
@@ -320,15 +268,15 @@ const styles = StyleSheet.create({
   },
   warningCard: {
     backgroundColor: colors.warning.primary + "20",
-    borderWidth: 1,
     borderColor: colors.warning.primary,
+    borderWidth: 1,
   },
   warningText: {
-    fontSize: typography.size.sm,
     color: colors.warning.primary,
+    fontSize: typography.size.sm,
     textAlign: "center",
   },
   bottomPadding: {
-    height: spacing.xxl,
+    height: spacing.xl * 2,
   },
 });

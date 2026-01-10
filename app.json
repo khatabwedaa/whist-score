@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "West Score",
-    "slug": "west-score",
+    "name": "Whist Score",
+    "slug": "whist-score",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
-    "scheme": "west-score",
+    "scheme": "whist-score",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",

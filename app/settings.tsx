@@ -1,5 +1,5 @@
 /**
- * West Score - Settings Screen (Arabic Only)
+ * Whist Score - Settings Screen
  */
 
 import { useRouter } from "expo-router";
@@ -12,7 +12,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Card } from "../components";
+import { AppLogo, Card } from "../components";
 import { t } from "../i18n";
 import { colors, spacing, typography } from "../lib/theme";
 
@@ -52,9 +52,7 @@ export default function SettingsScreen() {
 
         {/* App Logo and Name */}
         <View style={styles.appContainer}>
-          <View style={styles.logoIcon}>
-            <View style={styles.logoCircle} />
-          </View>
+          <AppLogo size="lg" />
           <Text style={styles.appName}>{t("appName")}</Text>
           <Text style={styles.appTagline}>{t("appTagline")}</Text>
         </View>
@@ -134,27 +132,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: spacing.xxl,
   },
-  logoIcon: {
-    width: 64,
-    height: 80,
-    backgroundColor: "#991b1b",
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: spacing.lg,
-  },
-  logoCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#f5f5f4",
-    marginTop: -12,
-  },
   appName: {
     fontSize: typography.size["2xl"],
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
     marginBottom: spacing.xs,
+    marginTop: spacing.lg,
   },
   appTagline: {
     fontSize: typography.size.base,

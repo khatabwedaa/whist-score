@@ -1,5 +1,5 @@
 /**
- * West Score - Home Screen (Minimal Design like Baloot Calculator)
+ * Whist Score - Home Screen
  */
 
 import { useFocusEffect, useRouter } from "expo-router";
@@ -13,6 +13,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { AppLogo } from "../components";
 import { t } from "../i18n";
 import { useGames } from "../lib/context";
 import { colors, spacing, typography } from "../lib/theme";
@@ -38,10 +39,6 @@ export default function HomeScreen() {
 
   const handleOpenSettings = () => {
     router.push("/settings");
-  };
-
-  const handleOpenStatistics = () => {
-    router.push("/statistics");
   };
 
   const renderGame = ({ item }: { item: Game }) => {
@@ -123,29 +120,19 @@ export default function HomeScreen() {
       {/* Header with App Logo */}
       <View style={styles.header}>
         <View style={styles.logoContainer}>
-          <View style={styles.logoIcon}>
-            <View style={styles.logoCircle} />
-          </View>
+          <AppLogo size="sm" />
           <View style={styles.titleContainer}>
             <Text style={styles.appName}>{t("appName")}</Text>
             <Text style={styles.tagline}>{t("appTagline")}</Text>
           </View>
         </View>
 
-        <View style={styles.headerButtons}>
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={handleOpenStatistics}
-          >
-            <Text style={styles.iconButtonText}>📊</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={handleOpenSettings}
-          >
-            <Text style={styles.iconButtonText}>⚙️</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={handleOpenSettings}
+        >
+          <Text style={styles.iconButtonText}>⚙️</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Games List */}
@@ -194,21 +181,6 @@ const styles = StyleSheet.create({
     flexDirection: "row-reverse",
     alignItems: "center",
     gap: spacing.md,
-  },
-  logoIcon: {
-    width: 44,
-    height: 56,
-    backgroundColor: "#991b1b",
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  logoCircle: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: "#f5f5f4",
-    marginTop: -8,
   },
   titleContainer: {
     alignItems: "flex-end",

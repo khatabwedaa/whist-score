@@ -1,5 +1,5 @@
 /**
- * West Score - New Game Screen
+ * Whist Score - New Game Screen (Simplified with Team Names Only)
  */
 
 import { useRouter } from "expo-router";
@@ -27,13 +27,11 @@ export default function NewGameScreen() {
   const router = useRouter();
   const { refreshGames } = useGames();
 
-  // Form state - auto-generate title on mount
+  // Form state
   const [title, setTitle] = useState("");
   const [note, setNote] = useState("");
-  const [player1, setPlayer1] = useState("");
-  const [player2, setPlayer2] = useState("");
-  const [player3, setPlayer3] = useState("");
-  const [player4, setPlayer4] = useState("");
+  const [teamAName, setTeamAName] = useState("");
+  const [teamBName, setTeamBName] = useState("");
   const [targetScore, setTargetScore] = useState(
     DEFAULT_GAME_SETTINGS.targetScore || 25
   );
@@ -41,9 +39,6 @@ export default function NewGameScreen() {
     DEFAULT_GAME_SETTINGS.failMode
   );
   const [isLoading, setIsLoading] = useState(false);
-
-  // Errors
-  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Auto-generate a fun game name on mount
   useEffect(() => {
@@ -55,28 +50,16 @@ export default function NewGameScreen() {
     setTitle(getRandomGameName());
   };
 
-  const validate = (): boolean => {
-    // Title is auto-generated, so just make sure it's not empty
-    if (!title.trim()) {
-      setTitle(getRandomGameName());
-    }
-    return true;
-  };
-
   const handleCreate = async () => {
-    if (!validate()) return;
+    const gameTitle = title.trim() || getRandomGameName();
 
     setIsLoading(true);
     try {
       const input: GameInput = {
-        title: title.trim(),
+        title: gameTitle,
         note: note.trim() || undefined,
-        players: [
-          { name: player1.trim() || t("player1"), team: "A" },
-          { name: player2.trim() || t("player2"), team: "B" },
-          { name: player3.trim() || t("player3"), team: "A" },
-          { name: player4.trim() || t("player4"), team: "B" },
-        ],
+        teamAName: teamAName.trim() || undefined,
+        teamBName: teamBName.trim() || undefined,
         settings: {
           targetScore,
           failMode,
@@ -117,20 +100,19 @@ export default function NewGameScreen() {
     <SafeAreaView style={styles.container} edges={["top"]}>
       {/* Header */}
       <View style={styles.header}>
-        <Button
-          title={t("cancel")}
-          onPress={handleCancel}
-          variant="ghost"
-          size="sm"
-        />
+        <TouchableOpacity onPress={handleCancel} style={styles.closeBtn}>
+          <Text style={styles.closeBtnText}>✕</Text>
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>{t("newGame")}</Text>
-        <Button
-          title={t("create")}
+        <TouchableOpacity
           onPress={handleCreate}
-          variant="primary"
-          size="sm"
-          loading={isLoading}
-        />
+          style={[styles.createBtn, isLoading && styles.createBtnDisabled]}
+          disabled={isLoading}
+        >
+          <Text style={styles.createBtnText}>
+            {isLoading ? "..." : t("create")}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <KeyboardAvoidingView
@@ -155,7 +137,6 @@ export default function NewGameScreen() {
                   value={title}
                   onChangeText={setTitle}
                   placeholder={t("gameTitle")}
-                  error={errors.title}
                   containerStyle={styles.titleInput}
                 />
               </View>
@@ -177,28 +158,22 @@ export default function NewGameScreen() {
             />
           </Card>
 
-          {/* Players */}
+          {/* Teams */}
           <Card style={styles.section}>
-            <Text style={styles.sectionTitle}>{t("players")}</Text>
+            <Text style={styles.sectionTitle}>{t("teams")}</Text>
 
             {/* Team A */}
             <View style={styles.teamSection}>
               <View style={styles.teamHeader}>
                 <View style={[styles.teamBadge, styles.teamABadge]}>
-                  <Text style={styles.teamBadgeText}>{t("teamA")}</Text>
+                  <Text style={styles.teamBadgeText}>{t("us")}</Text>
                 </View>
               </View>
               <Input
-                label={t("player1")}
-                value={player1}
-                onChangeText={setPlayer1}
-                placeholder={t("playerName")}
-              />
-              <Input
-                label={t("player3")}
-                value={player3}
-                onChangeText={setPlayer3}
-                placeholder={t("playerName")}
+                label={t("teamAName")}
+                value={teamAName}
+                onChangeText={setTeamAName}
+                placeholder={t("us")}
               />
             </View>
 
@@ -206,20 +181,14 @@ export default function NewGameScreen() {
             <View style={styles.teamSection}>
               <View style={styles.teamHeader}>
                 <View style={[styles.teamBadge, styles.teamBBadge]}>
-                  <Text style={styles.teamBadgeText}>{t("teamB")}</Text>
+                  <Text style={styles.teamBadgeText}>{t("them")}</Text>
                 </View>
               </View>
               <Input
-                label={t("player2")}
-                value={player2}
-                onChangeText={setPlayer2}
-                placeholder={t("playerName")}
-              />
-              <Input
-                label={t("player4")}
-                value={player4}
-                onChangeText={setPlayer4}
-                placeholder={t("playerName")}
+                label={t("teamBName")}
+                value={teamBName}
+                onChangeText={setTeamBName}
+                placeholder={t("them")}
               />
             </View>
           </Card>
@@ -275,18 +244,39 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.border.primary,
   },
-  headerRTL: {
-    flexDirection: "row-reverse",
+  closeBtn: {
+    width: 44,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  closeBtnText: {
+    fontSize: 20,
+    color: colors.text.secondary,
   },
   headerTitle: {
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
+  },
+  createBtn: {
+    backgroundColor: "#dc2626",
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: 8,
+  },
+  createBtnDisabled: {
+    opacity: 0.5,
+  },
+  createBtnText: {
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.bold,
+    color: "#ffffff",
   },
   keyboardView: {
     flex: 1,
@@ -305,12 +295,10 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.semibold,
     color: colors.text.primary,
     marginBottom: spacing.lg,
-  },
-  textRTL: {
     textAlign: "right",
   },
   titleInputContainer: {
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     alignItems: "flex-start",
     gap: spacing.sm,
   },
@@ -338,11 +326,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   teamHeader: {
-    flexDirection: "row",
-    marginBottom: spacing.md,
-  },
-  teamHeaderRTL: {
     flexDirection: "row-reverse",
+    marginBottom: spacing.sm,
   },
   teamBadge: {
     paddingHorizontal: spacing.md,
@@ -350,27 +335,29 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.full,
   },
   teamABadge: {
-    backgroundColor: colors.teamA.primary,
+    backgroundColor: "#16a34a",
   },
   teamBBadge: {
-    backgroundColor: colors.teamB.primary,
+    backgroundColor: "#dc2626",
   },
   teamBadgeText: {
     fontSize: typography.size.sm,
     fontWeight: typography.weight.semibold,
-    color: colors.text.inverse,
+    color: "#ffffff",
   },
   label: {
     fontSize: typography.size.sm,
     fontWeight: typography.weight.medium,
     color: colors.text.secondary,
     marginBottom: spacing.sm,
+    textAlign: "right",
   },
   settingDescription: {
     fontSize: typography.size.sm,
     color: colors.text.muted,
     marginBottom: spacing.md,
     marginTop: -spacing.sm,
+    textAlign: "right",
   },
   failModeContainer: {
     marginTop: spacing.md,

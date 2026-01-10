@@ -1,16 +1,15 @@
 /**
- * West Score - Storage Layer
+ * Whist Score - Storage Layer
  * Handles offline storage of games using AsyncStorage
  */
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Crypto from "expo-crypto";
-import { calculateRoundScore, recalculateGameTotals } from "./scoring";
+import { calculateRoundScore } from "./scoring";
 import {
   DEFAULT_GAME_SETTINGS,
   Game,
   GameInput,
-  Player,
   Round,
   RoundInput,
 } from "./types";
@@ -22,7 +21,7 @@ function generateId(): string {
   return Crypto.randomUUID();
 }
 
-const STORAGE_KEY = "west_score_games_v1";
+const STORAGE_KEY = "whist_score_games_v2";
 
 /**
  * Load all games from storage
@@ -61,20 +60,14 @@ export async function createGame(input: GameInput): Promise<Game> {
 
   const now = new Date().toISOString();
 
-  // Create players with IDs
-  const players: Player[] = input.players.map((p, index) => ({
-    id: generateId(),
-    name: p.name || `Player ${index + 1}`,
-    team: p.team,
-  }));
-
   const newGame: Game = {
     id: generateId(),
     title: input.title,
     note: input.note,
     createdAt: now,
     updatedAt: now,
-    players,
+    teamAName: input.teamAName || "لنا",
+    teamBName: input.teamBName || "لهم",
     rounds: [],
     totalScoreTeamA: 0,
     totalScoreTeamB: 0,
@@ -155,7 +148,6 @@ export async function addRound(
       tricksTeamB: roundInput.tricksTeamB,
       scoreTeamA,
       scoreTeamB,
-      bonusApplied: roundInput.bonusApplied,
       createdAt: new Date().toISOString(),
     };
 
@@ -198,7 +190,6 @@ export async function updateRound(
       tricksTeamB: roundInput.tricksTeamB,
       scoreTeamA,
       scoreTeamB,
-      bonusApplied: roundInput.bonusApplied,
     };
 
     const newRounds = [...game.rounds];
@@ -239,6 +230,35 @@ export async function deleteRound(
       totalScoreTeamB,
     };
   });
+}
+
+/**
+ * Recalculate all round scores and totals for a game
+ * Used when game settings change
+ */
+function recalculateGameTotals(game: Game): Game {
+  const newRounds = game.rounds.map((round) => {
+    const { scoreTeamA, scoreTeamB } = calculateRoundScore(
+      {
+        declarerTeam: round.declarerTeam,
+        bid: round.bid,
+        tricksTeamA: round.tricksTeamA,
+        tricksTeamB: round.tricksTeamB,
+      },
+      game.settings
+    );
+    return { ...round, scoreTeamA, scoreTeamB };
+  });
+
+  const totalScoreTeamA = newRounds.reduce((sum, r) => sum + r.scoreTeamA, 0);
+  const totalScoreTeamB = newRounds.reduce((sum, r) => sum + r.scoreTeamB, 0);
+
+  return {
+    ...game,
+    rounds: newRounds,
+    totalScoreTeamA,
+    totalScoreTeamB,
+  };
 }
 
 /**

@@ -1,15 +1,9 @@
 /**
- * West Score - TypeScript Data Models
+ * Whist Score - TypeScript Data Models
  * For Sudanese Whist (ويست) card game score tracking
  */
 
 export type TeamId = "A" | "B";
-
-export interface Player {
-  id: string;
-  name: string;
-  team: TeamId;
-}
 
 /**
  * Scoring modes when the declarer fails to meet their bid:
@@ -24,10 +18,7 @@ export type FailMode =
 
 export interface GameSettings {
   targetScore?: number; // e.g., 25 - game ends when a team reaches this
-  roundsLimit?: number; // optional max number of rounds
   failMode: FailMode; // how to score when declarer fails
-  bonusAllTricks?: number; // bonus for taking all 13 tricks
-  bonusSeik?: number; // bonus for "سيك" (special condition)
   minBid: number; // minimum bid allowed (default: 7)
   maxBid: number; // maximum bid allowed (default: 13)
 }
@@ -41,11 +32,6 @@ export interface Round {
   tricksTeamB: number; // tricks won by Team B (0-13, A+B must = 13)
   scoreTeamA: number; // computed score for Team A this round
   scoreTeamB: number; // computed score for Team B this round
-  bonusApplied?: {
-    // optional bonus tracking
-    allTricks?: TeamId; // which team got all 13 tricks
-    seik?: TeamId; // which team got seik bonus
-  };
   createdAt: string; // ISO date string
 }
 
@@ -55,7 +41,8 @@ export interface Game {
   note?: string;
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
-  players: Player[]; // 4 players
+  teamAName: string; // Team A name (default: لنا)
+  teamBName: string; // Team B name (default: لهم)
   rounds: Round[];
   totalScoreTeamA: number;
   totalScoreTeamB: number;
@@ -72,10 +59,6 @@ export interface RoundInput {
   bid: number;
   tricksTeamA: number;
   tricksTeamB: number;
-  bonusApplied?: {
-    allTricks?: TeamId;
-    seik?: TeamId;
-  };
 }
 
 /**
@@ -84,7 +67,8 @@ export interface RoundInput {
 export interface GameInput {
   title: string;
   note?: string;
-  players: Omit<Player, "id">[];
+  teamAName?: string;
+  teamBName?: string;
   settings?: Partial<GameSettings>;
 }
 
@@ -93,10 +77,7 @@ export interface GameInput {
  */
 export const DEFAULT_GAME_SETTINGS: GameSettings = {
   targetScore: 25,
-  roundsLimit: undefined,
   failMode: "minusBid_opponentTricks",
-  bonusAllTricks: undefined,
-  bonusSeik: undefined,
   minBid: 7,
   maxBid: 13,
 };
@@ -105,4 +86,3 @@ export const DEFAULT_GAME_SETTINGS: GameSettings = {
  * Constants
  */
 export const TOTAL_TRICKS = 13;
-export const TOTAL_PLAYERS = 4;
