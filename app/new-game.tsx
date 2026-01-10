@@ -294,13 +294,13 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.semibold,
     color: colors.text.primary,
     marginBottom: spacing.lg,
-    textAlign: "right",
+    textAlign: "left",
   },
   teamSection: {
     marginBottom: spacing.md,
   },
   teamHeader: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     marginBottom: spacing.sm,
   },
   teamBadge: {
@@ -324,14 +324,14 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.medium,
     color: colors.text.secondary,
     marginBottom: spacing.sm,
-    textAlign: "right",
+    textAlign: "left",
   },
   settingDescription: {
     fontSize: typography.size.sm,
     color: colors.text.muted,
     marginBottom: spacing.md,
     marginTop: -spacing.sm,
-    textAlign: "right",
+    textAlign: "left",
   },
   failModeContainer: {
     marginTop: spacing.md,
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   roundsToggleRow: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: spacing.sm,

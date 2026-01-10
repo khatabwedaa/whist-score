@@ -102,14 +102,14 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.semibold,
     color: colors.text.primary,
     marginBottom: spacing.sm,
-    textAlign: "right",
+    textAlign: "left",
   },
   aboutText: {
     fontSize: typography.size.base,
     color: colors.text.secondary,
     lineHeight: 24,
     marginBottom: spacing.lg,
-    textAlign: "right",
+    textAlign: "left",
   },
   versionContainer: {
     flexDirection: "row-reverse",

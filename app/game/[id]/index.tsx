@@ -1013,7 +1013,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.sm,
-    backgroundColor: colors.surface.secondary,
+    backgroundColor: colors.surface.primary,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: 12,
@@ -1023,7 +1023,7 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
   },
   numberInputContainer: {
-    backgroundColor: colors.surface.secondary,
+    backgroundColor: colors.surface.primary,
     borderRadius: 16,
     padding: spacing.sm,
   },

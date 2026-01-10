@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   labelRTL: {
-    textAlign: "right",
+    textAlign: "left",
   },
   input: {
     backgroundColor: colors.surface.secondary,
