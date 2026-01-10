@@ -1,20 +1,13 @@
 /**
- * West Score - Scroll Picker Component
- * A scrollable number picker for selecting numeric values
+ * Whist Score - Native Picker Component
+ * Uses the native iOS/Android picker for smooth performance
  */
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  ViewStyle,
-} from "react-native";
+import { Picker } from "@react-native-picker/picker";
+import React from "react";
+import { Platform, StyleSheet, Text, View, ViewStyle } from "react-native";
 import { useLanguage } from "../lib/context";
-import { borderRadius, colors, spacing, typography } from "../lib/theme";
+import { colors, spacing, typography } from "../lib/theme";
 
 interface ScrollPickerProps {
   label?: string;
@@ -24,12 +17,7 @@ interface ScrollPickerProps {
   max?: number;
   error?: string;
   containerStyle?: ViewStyle;
-  itemHeight?: number;
-  visibleItems?: number;
 }
-
-const ITEM_HEIGHT = 50;
-const VISIBLE_ITEMS = 3;
 
 export function ScrollPicker({
   label,
@@ -39,72 +27,11 @@ export function ScrollPicker({
   max = 13,
   error,
   containerStyle,
-  itemHeight = ITEM_HEIGHT,
-  visibleItems = VISIBLE_ITEMS,
 }: ScrollPickerProps) {
   const { isRTL } = useLanguage();
-  const scrollViewRef = useRef<ScrollView>(null);
-  const [isScrolling, setIsScrolling] = useState(false);
 
   // Generate array of numbers from min to max
   const numbers = Array.from({ length: max - min + 1 }, (_, i) => min + i);
-
-  // Calculate padding to center items
-  const paddingVertical = (itemHeight * (visibleItems - 1)) / 2;
-  const containerHeight = itemHeight * visibleItems;
-
-  // Scroll to current value on mount and when value changes externally
-  useEffect(() => {
-    if (!isScrolling) {
-      const index = value - min;
-      scrollViewRef.current?.scrollTo({
-        y: index * itemHeight,
-        animated: true,
-      });
-    }
-  }, [value, min, itemHeight, isScrolling]);
-
-  const handleScrollEnd = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      setIsScrolling(false);
-      const offsetY = event.nativeEvent.contentOffset.y;
-      const index = Math.round(offsetY / itemHeight);
-      const clampedIndex = Math.max(0, Math.min(index, numbers.length - 1));
-      const newValue = numbers[clampedIndex];
-
-      if (newValue !== value) {
-        onChange(newValue);
-      }
-
-      // Snap to item
-      scrollViewRef.current?.scrollTo({
-        y: clampedIndex * itemHeight,
-        animated: true,
-      });
-    },
-    [itemHeight, numbers, value, onChange]
-  );
-
-  const handleScrollBegin = () => {
-    setIsScrolling(true);
-  };
-
-  const getItemStyle = (num: number) => {
-    const isSelected = num === value;
-    return [
-      styles.item,
-      { height: itemHeight },
-      isSelected && styles.itemSelected,
-    ];
-  };
-
-  const getTextStyle = (num: number) => {
-    const isSelected = num === value;
-    return [
-      styles.itemText,
-      isSelected ? styles.itemTextSelected : styles.itemTextUnselected,
-    ];
-  };
 
   return (
     <View style={[styles.container, containerStyle]}>
@@ -112,53 +39,17 @@ export function ScrollPicker({
         <Text style={[styles.label, isRTL && styles.labelRTL]}>{label}</Text>
       )}
 
-      <View style={[styles.pickerContainer, { height: containerHeight }]}>
-        {/* Selection indicator */}
-        <View
-          style={[
-            styles.selectionIndicator,
-            {
-              top: paddingVertical,
-              height: itemHeight,
-            },
-          ]}
-        />
-
-        <ScrollView
-          ref={scrollViewRef}
-          showsVerticalScrollIndicator={false}
-          snapToInterval={itemHeight}
-          decelerationRate="fast"
-          onScrollBeginDrag={handleScrollBegin}
-          onMomentumScrollEnd={handleScrollEnd}
-          onScrollEndDrag={(e) => {
-            // If no momentum, handle scroll end here
-            if (e.nativeEvent.velocity?.y === 0) {
-              handleScrollEnd(e);
-            }
-          }}
-          contentContainerStyle={{
-            paddingVertical,
-          }}
-          nestedScrollEnabled
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={value}
+          onValueChange={(itemValue) => onChange(itemValue as number)}
+          style={styles.picker}
+          itemStyle={styles.pickerItem}
         >
           {numbers.map((num) => (
-            <View key={num} style={getItemStyle(num)}>
-              <Text style={getTextStyle(num)}>{num}</Text>
-            </View>
+            <Picker.Item key={num} label={String(num)} value={num} />
           ))}
-        </ScrollView>
-
-        {/* Top fade gradient effect */}
-        <View
-          style={[styles.fadeTop, { height: paddingVertical }]}
-          pointerEvents="none"
-        />
-        {/* Bottom fade gradient effect */}
-        <View
-          style={[styles.fadeBottom, { height: paddingVertical }]}
-          pointerEvents="none"
-        />
+        </Picker>
       </View>
 
       {error && (
@@ -183,53 +74,31 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   pickerContainer: {
-    width: 100,
+    width: 120,
+    height: 150,
     backgroundColor: colors.surface.primary,
-    borderRadius: borderRadius.lg,
-    borderWidth: 1,
-    borderColor: colors.border.primary,
+    borderRadius: 12,
     overflow: "hidden",
-  },
-  selectionIndicator: {
-    position: "absolute",
-    left: 4,
-    right: 4,
-    backgroundColor: colors.surface.secondary,
-    borderRadius: borderRadius.md,
-    zIndex: 0,
-  },
-  item: {
     justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1,
   },
-  itemSelected: {},
-  itemText: {
-    fontWeight: typography.weight.bold,
+  picker: {
+    width: "100%",
+    height: 150,
+    ...Platform.select({
+      ios: {
+        // iOS specific styles
+      },
+      android: {
+        color: colors.text.primary,
+        backgroundColor: colors.surface.primary,
+      },
+    }),
   },
-  itemTextSelected: {
-    fontSize: typography.size["3xl"],
+  pickerItem: {
+    fontSize: 28,
+    fontWeight: "600",
     color: colors.text.primary,
-  },
-  itemTextUnselected: {
-    fontSize: typography.size.xl,
-    color: colors.text.muted,
-  },
-  fadeTop: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "transparent",
-    opacity: 0.5,
-  },
-  fadeBottom: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "transparent",
-    opacity: 0.5,
+    height: 150,
   },
   error: {
     fontSize: typography.size.sm,
