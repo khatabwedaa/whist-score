@@ -162,20 +162,20 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container} edges={["top"]}>
       {/* Header with App Logo */}
       <View style={styles.header}>
-        <View style={styles.logoContainer}>
-          <AppLogo size="sm" />
-          <View style={styles.titleContainer}>
-            <Text style={styles.appName}>{t("appName")}</Text>
-            <Text style={styles.tagline}>{t("appTagline")}</Text>
-          </View>
-        </View>
-
         <TouchableOpacity
           style={styles.iconButton}
           onPress={handleOpenSettings}
         >
-          <Text style={styles.iconButtonText}>⚙️</Text>
+          <Text style={styles.iconButtonText}>ℹ️</Text>
         </TouchableOpacity>
+
+        <View style={styles.logoContainer}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.appName}>{t("appName")}</Text>
+            <Text style={styles.tagline}>{t("appTagline")}</Text>
+          </View>
+          <AppLogo size="sm" />
+        </View>
       </View>
 
       {/* Games List */}
@@ -214,14 +214,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.primary,
   },
   header: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.lg,
   },
   logoContainer: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     gap: spacing.md,
   },

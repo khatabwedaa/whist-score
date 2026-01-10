@@ -212,7 +212,7 @@ export default function GameDetailScreen() {
           <Text style={styles.closeBtnText}>✕</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>
-          {game.title}
+          {game.date}
         </Text>
         <TouchableOpacity onPress={handleDeleteGame} style={styles.deleteBtn}>
           <Text style={styles.deleteBtnText}>🗑</Text>

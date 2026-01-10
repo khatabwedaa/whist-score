@@ -51,9 +51,6 @@ export function GameCard({ game, onPress }: GameCardProps) {
         <View
           style={[styles.titleContainer, isRTL && styles.titleContainerRTL]}
         >
-          <Text style={styles.title} numberOfLines={1}>
-            {game.title}
-          </Text>
           <Text style={styles.date}>{formatDate(game.updatedAt)}</Text>
         </View>
         <View

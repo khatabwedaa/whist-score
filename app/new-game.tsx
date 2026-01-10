@@ -3,7 +3,7 @@
  */
 
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -19,7 +19,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, Input, NumberInput } from "../components";
 import { t } from "../i18n";
 import { useGames } from "../lib/context";
-import { getRandomGameName } from "../lib/gameNames";
 import { createGame } from "../lib/storage";
 import { borderRadius, colors, spacing, typography } from "../lib/theme";
 import { DEFAULT_GAME_SETTINGS, FailMode, GameInput } from "../lib/types";
@@ -29,7 +28,6 @@ export default function NewGameScreen() {
   const { refreshGames } = useGames();
 
   // Form state
-  const [title, setTitle] = useState("");
   const [note, setNote] = useState("");
   const [teamAName, setTeamAName] = useState("");
   const [teamBName, setTeamBName] = useState("");
@@ -45,18 +43,13 @@ export default function NewGameScreen() {
   const [unlimitedRounds, setUnlimitedRounds] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Auto-generate a fun game name on mount
-  useEffect(() => {
-    setTitle(getRandomGameName());
-  }, []);
-
-  // Generate a new random name
-  const regenerateName = () => {
-    setTitle(getRandomGameName());
-  };
-
   const handleCreate = async () => {
-    const gameTitle = title.trim() || getRandomGameName();
+    // Auto-generate title based on date and time
+    const now = new Date();
+    const gameTitle = `${now.toLocaleDateString("ar")} ${now.toLocaleTimeString(
+      "ar",
+      { hour: "2-digit", minute: "2-digit" }
+    )}`;
 
     setIsLoading(true);
     try {
@@ -131,39 +124,6 @@ export default function NewGameScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Game Info */}
-          <Card style={styles.section}>
-            <Text style={styles.sectionTitle}>{t("game")}</Text>
-
-            {/* Game Title with Regenerate Button */}
-            <View style={styles.titleInputContainer}>
-              <View style={styles.titleInputWrapper}>
-                <Input
-                  label={t("gameTitle")}
-                  value={title}
-                  onChangeText={setTitle}
-                  placeholder={t("gameTitle")}
-                  containerStyle={styles.titleInput}
-                />
-              </View>
-              <TouchableOpacity
-                style={styles.regenerateButton}
-                onPress={regenerateName}
-              >
-                <Text style={styles.regenerateIcon}>🎲</Text>
-              </TouchableOpacity>
-            </View>
-
-            <Input
-              label={t("gameNote")}
-              value={note}
-              onChangeText={setNote}
-              placeholder={t("gameNote")}
-              multiline
-              numberOfLines={2}
-            />
-          </Card>
-
           {/* Teams */}
           <Card style={styles.section}>
             <Text style={styles.sectionTitle}>{t("teams")}</Text>
@@ -335,31 +295,6 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     marginBottom: spacing.lg,
     textAlign: "right",
-  },
-  titleInputContainer: {
-    flexDirection: "row-reverse",
-    alignItems: "flex-start",
-    gap: spacing.sm,
-  },
-  titleInputWrapper: {
-    flex: 1,
-  },
-  titleInput: {
-    marginBottom: 0,
-  },
-  regenerateButton: {
-    marginTop: 28,
-    width: 48,
-    height: 48,
-    backgroundColor: colors.surface.secondary,
-    borderRadius: borderRadius.md,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: colors.border.primary,
-  },
-  regenerateIcon: {
-    fontSize: 24,
   },
   teamSection: {
     marginBottom: spacing.md,

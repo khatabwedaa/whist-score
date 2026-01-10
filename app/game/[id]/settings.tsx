@@ -4,7 +4,14 @@
 
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, Input, NumberInput } from "../../../components";
 import { t } from "../../../i18n";
@@ -27,6 +34,8 @@ export default function GameSettingsScreen() {
   const [note, setNote] = useState("");
   const [targetScore, setTargetScore] = useState(25);
   const [failMode, setFailMode] = useState<FailMode>("minusBid_opponentTricks");
+  const [maxRounds, setMaxRounds] = useState(4);
+  const [unlimitedRounds, setUnlimitedRounds] = useState(false);
 
   const loadGame = useCallback(async () => {
     if (!id) return;
@@ -38,6 +47,8 @@ export default function GameSettingsScreen() {
       setNote(loaded.note || "");
       setTargetScore(loaded.settings.targetScore || 25);
       setFailMode(loaded.settings.failMode);
+      setMaxRounds(loaded.settings.maxRounds || 4);
+      setUnlimitedRounds(loaded.settings.maxRounds === undefined);
     }
   }, [id]);
 
@@ -76,6 +87,7 @@ export default function GameSettingsScreen() {
       await updateGameSettings(id, {
         targetScore: targetScore > 0 ? targetScore : undefined,
         failMode,
+        maxRounds: unlimitedRounds ? undefined : maxRounds,
       });
 
       await refreshGames();
@@ -159,6 +171,41 @@ export default function GameSettingsScreen() {
           <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
             {t("settings")}
           </Text>
+
+          {/* Max Rounds Setting */}
+          <View style={styles.roundsSettingContainer}>
+            <View style={styles.roundsToggleRow}>
+              <Text style={[styles.label, isRTL && styles.textRTL]}>
+                {t("maxRounds")}
+              </Text>
+              <View style={styles.unlimitedToggle}>
+                <Text style={styles.unlimitedLabel}>
+                  {t("unlimitedRounds")}
+                </Text>
+                <Switch
+                  value={unlimitedRounds}
+                  onValueChange={setUnlimitedRounds}
+                  trackColor={{
+                    false: colors.surface.tertiary,
+                    true: "#0ea5e9",
+                  }}
+                  thumbColor="#ffffff"
+                />
+              </View>
+            </View>
+            {!unlimitedRounds && (
+              <NumberInput
+                value={maxRounds}
+                onChange={setMaxRounds}
+                min={1}
+                max={20}
+                step={1}
+              />
+            )}
+            <Text style={[styles.description, isRTL && styles.textRTL]}>
+              {t("maxRoundsDescription")}
+            </Text>
+          </View>
 
           <NumberInput
             label={t("targetScore")}
@@ -262,6 +309,30 @@ const styles = StyleSheet.create({
     color: colors.text.muted,
     marginTop: -spacing.sm,
     marginBottom: spacing.md,
+  },
+  label: {
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.medium,
+    color: colors.text.secondary,
+    marginBottom: spacing.sm,
+  },
+  roundsSettingContainer: {
+    marginBottom: spacing.lg,
+  },
+  roundsToggleRow: {
+    flexDirection: "row-reverse",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: spacing.sm,
+  },
+  unlimitedToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+  unlimitedLabel: {
+    fontSize: typography.size.sm,
+    color: colors.text.muted,
   },
   optionButton: {
     marginBottom: spacing.sm,
