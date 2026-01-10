@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 150,
     backgroundColor: colors.surface.primary,
-    borderRadius: 12,
+    borderRadius: 24,
     overflow: "hidden",
     justifyContent: "center",
   },

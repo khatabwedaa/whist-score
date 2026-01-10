@@ -41,6 +41,23 @@ export default function HomeScreen() {
     router.push("/settings");
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (dateString.split("T")[0] === today.toISOString().split("T")[0]) {
+      return t("today");
+    } else if (
+      dateString.split("T")[0] === yesterday.toISOString().split("T")[0]
+    ) {
+      return t("yesterday");
+    }
+
+    return date.toLocaleDateString("ar-SD", { day: "numeric", month: "short" });
+  };
+
   const renderGame = ({ item }: { item: Game }) => {
     const isFinished = item.isFinished;
     const leadingTeam =
@@ -50,16 +67,17 @@ export default function HomeScreen() {
         ? "B"
         : null;
 
+    const gameDate = item.date || item.createdAt;
+
     return (
       <TouchableOpacity
         style={styles.gameCard}
         onPress={() => handleOpenGame(item)}
         activeOpacity={0.7}
       >
-        <View style={styles.gameHeader}>
-          <Text style={styles.gameTitle} numberOfLines={1}>
-            {item.title}
-          </Text>
+        {/* Date Badge */}
+        <View style={styles.dateRow}>
+          <Text style={styles.dateText}>{formatDate(gameDate)}</Text>
           <View
             style={[styles.statusBadge, isFinished && styles.finishedBadge]}
           >
@@ -69,27 +87,44 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <View style={styles.scoreRow}>
-          <View style={styles.teamScore}>
-            <Text style={styles.teamLabel}>{t("us")}</Text>
+        {/* Teams vs Teams */}
+        <View style={styles.teamsRow}>
+          <View style={styles.teamContainer}>
             <Text
               style={[
-                styles.scoreValue,
-                leadingTeam === "A" && styles.leadingScore,
+                styles.teamName,
+                leadingTeam === "A" && styles.winningTeam,
+              ]}
+            >
+              {item.teamAName || t("us")}
+            </Text>
+            <Text
+              style={[
+                styles.teamScoreValue,
+                leadingTeam === "A" && styles.winningScore,
               ]}
             >
               {item.totalScoreTeamA}
             </Text>
           </View>
 
-          <Text style={styles.scoreDash}>—</Text>
+          <View style={styles.vsContainer}>
+            <Text style={styles.vsText}>{t("vs")}</Text>
+          </View>
 
-          <View style={styles.teamScore}>
-            <Text style={styles.teamLabel}>{t("them")}</Text>
+          <View style={styles.teamContainer}>
             <Text
               style={[
-                styles.scoreValue,
-                leadingTeam === "B" && styles.leadingScore,
+                styles.teamName,
+                leadingTeam === "B" && styles.winningTeam,
+              ]}
+            >
+              {item.teamBName || t("them")}
+            </Text>
+            <Text
+              style={[
+                styles.teamScoreValue,
+                leadingTeam === "B" && styles.winningScore,
               ]}
             >
               {item.totalScoreTeamB}
@@ -97,9 +132,17 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <Text style={styles.roundsInfo}>
-          {item.rounds.length} {t("rounds")}
-        </Text>
+        {/* Rounds info */}
+        <View style={styles.bottomRow}>
+          <Text style={styles.roundsInfo}>
+            {item.rounds.length} {t("rounds")}
+          </Text>
+          {item.settings.maxRounds && (
+            <Text style={styles.maxRoundsInfo}>
+              / {item.settings.maxRounds}
+            </Text>
+          )}
+        </View>
       </TouchableOpacity>
     );
   };
@@ -213,9 +256,21 @@ const styles = StyleSheet.create({
   },
   gameCard: {
     backgroundColor: colors.surface.primary,
-    borderRadius: 12,
+    borderRadius: 20,
     padding: spacing.lg,
     marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border.primary,
+  },
+  dateRow: {
+    flexDirection: "row-reverse",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: spacing.md,
+  },
+  dateText: {
+    fontSize: typography.size.sm,
+    color: colors.text.muted,
   },
   gameHeader: {
     flexDirection: "row-reverse",
@@ -231,10 +286,10 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   statusBadge: {
-    backgroundColor: colors.teamA.primary,
+    backgroundColor: "#0ea5e9",
     paddingHorizontal: spacing.sm,
     paddingVertical: 4,
-    borderRadius: 12,
+    borderRadius: 20,
   },
   finishedBadge: {
     backgroundColor: colors.text.muted,
@@ -242,7 +297,47 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: typography.size.xs,
     fontWeight: typography.weight.medium,
+    color: "#ffffff",
+  },
+  teamsRow: {
+    flexDirection: "row-reverse",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: spacing.md,
+    gap: spacing.md,
+  },
+  teamContainer: {
+    flex: 1,
+    alignItems: "center",
+    backgroundColor: colors.surface.secondary,
+    borderRadius: 16,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
+  },
+  teamName: {
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.medium,
+    color: colors.text.secondary,
+    marginBottom: spacing.xs,
+  },
+  winningTeam: {
+    color: "#22c55e",
+  },
+  teamScoreValue: {
+    fontSize: typography.size["3xl"],
+    fontWeight: typography.weight.bold,
     color: colors.text.primary,
+  },
+  winningScore: {
+    color: "#22c55e",
+  },
+  vsContainer: {
+    paddingHorizontal: spacing.sm,
+  },
+  vsText: {
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.medium,
+    color: colors.text.muted,
   },
   scoreRow: {
     flexDirection: "row-reverse",
@@ -271,10 +366,19 @@ const styles = StyleSheet.create({
     fontSize: typography.size["2xl"],
     color: colors.text.muted,
   },
+  bottomRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   roundsInfo: {
     fontSize: typography.size.sm,
     color: colors.text.muted,
     textAlign: "center",
+  },
+  maxRoundsInfo: {
+    fontSize: typography.size.sm,
+    color: colors.text.muted,
   },
   emptyState: {
     flex: 1,

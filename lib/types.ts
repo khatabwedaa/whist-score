@@ -21,6 +21,7 @@ export interface GameSettings {
   failMode: FailMode; // how to score when declarer fails
   minBid: number; // minimum bid allowed (default: 7)
   maxBid: number; // maximum bid allowed (default: 13)
+  maxRounds?: number; // maximum number of rounds (undefined = unlimited)
 }
 
 export interface Round {
@@ -41,6 +42,7 @@ export interface Game {
   note?: string;
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
+  date: string; // Game date (YYYY-MM-DD format)
   teamAName: string; // Team A name (default: لنا)
   teamBName: string; // Team B name (default: لهم)
   rounds: Round[];
@@ -48,6 +50,7 @@ export interface Game {
   totalScoreTeamB: number;
   isFinished: boolean;
   finishedAt?: string; // ISO date string when game was marked finished
+  winnerTeam?: TeamId; // The winning team if game is finished
   settings: GameSettings;
 }
 
@@ -80,6 +83,7 @@ export const DEFAULT_GAME_SETTINGS: GameSettings = {
   failMode: "minusBid_opponentTricks",
   minBid: 7,
   maxBid: 13,
+  maxRounds: 4, // Default to 4 rounds
 };
 
 /**

@@ -10,6 +10,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -38,6 +39,10 @@ export default function NewGameScreen() {
   const [failMode, setFailMode] = useState<FailMode>(
     DEFAULT_GAME_SETTINGS.failMode
   );
+  const [maxRounds, setMaxRounds] = useState(
+    DEFAULT_GAME_SETTINGS.maxRounds || 4
+  );
+  const [unlimitedRounds, setUnlimitedRounds] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   // Auto-generate a fun game name on mount
@@ -63,6 +68,7 @@ export default function NewGameScreen() {
         settings: {
           targetScore,
           failMode,
+          maxRounds: unlimitedRounds ? undefined : maxRounds,
         },
       };
 
@@ -197,6 +203,39 @@ export default function NewGameScreen() {
           <Card style={styles.section}>
             <Text style={styles.sectionTitle}>{t("gameSettings")}</Text>
 
+            {/* Max Rounds Setting */}
+            <View style={styles.roundsSettingContainer}>
+              <View style={styles.roundsToggleRow}>
+                <Text style={styles.label}>{t("maxRounds")}</Text>
+                <View style={styles.unlimitedToggle}>
+                  <Text style={styles.unlimitedLabel}>
+                    {t("unlimitedRounds")}
+                  </Text>
+                  <Switch
+                    value={unlimitedRounds}
+                    onValueChange={setUnlimitedRounds}
+                    trackColor={{
+                      false: colors.surface.tertiary,
+                      true: "#0ea5e9",
+                    }}
+                    thumbColor="#ffffff"
+                  />
+                </View>
+              </View>
+              {!unlimitedRounds && (
+                <NumberInput
+                  value={maxRounds}
+                  onChange={setMaxRounds}
+                  min={1}
+                  max={20}
+                  step={1}
+                />
+              )}
+              <Text style={styles.settingDescription}>
+                {t("maxRoundsDescription")}
+              </Text>
+            </View>
+
             <NumberInput
               label={t("targetScore")}
               value={targetScore}
@@ -265,10 +304,10 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
   },
   createBtn: {
-    backgroundColor: "#dc2626",
+    backgroundColor: "#0ea5e9",
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
-    borderRadius: 8,
+    borderRadius: 20,
   },
   createBtnDisabled: {
     opacity: 0.5,
@@ -338,7 +377,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#16a34a",
   },
   teamBBadge: {
-    backgroundColor: "#dc2626",
+    backgroundColor: "#f59e0b",
   },
   teamBadgeText: {
     fontSize: typography.size.sm,
@@ -364,6 +403,24 @@ const styles = StyleSheet.create({
   },
   failModeButton: {
     marginBottom: spacing.sm,
+  },
+  roundsSettingContainer: {
+    marginBottom: spacing.lg,
+  },
+  roundsToggleRow: {
+    flexDirection: "row-reverse",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: spacing.sm,
+  },
+  unlimitedToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+  unlimitedLabel: {
+    fontSize: typography.size.sm,
+    color: colors.text.muted,
   },
   bottomPadding: {
     height: spacing.xxl,

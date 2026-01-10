@@ -59,6 +59,7 @@ export async function createGame(input: GameInput): Promise<Game> {
   const games = await loadGames();
 
   const now = new Date().toISOString();
+  const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD format
 
   const newGame: Game = {
     id: generateId(),
@@ -66,6 +67,7 @@ export async function createGame(input: GameInput): Promise<Game> {
     note: input.note,
     createdAt: now,
     updatedAt: now,
+    date: today,
     teamAName: input.teamAName || "لنا",
     teamBName: input.teamBName || "لهم",
     rounds: [],
@@ -154,11 +156,51 @@ export async function addRound(
     const newTotalA = game.totalScoreTeamA + scoreTeamA;
     const newTotalB = game.totalScoreTeamB + scoreTeamB;
 
+    // Check for game over conditions
+    let isFinished = game.isFinished;
+    let winnerTeam: "A" | "B" | undefined = game.winnerTeam;
+    let finishedAt = game.finishedAt;
+
+    // Check if target score is reached
+    if (game.settings.targetScore) {
+      if (newTotalA >= game.settings.targetScore && newTotalA > newTotalB) {
+        isFinished = true;
+        winnerTeam = "A";
+        finishedAt = new Date().toISOString();
+      } else if (
+        newTotalB >= game.settings.targetScore &&
+        newTotalB > newTotalA
+      ) {
+        isFinished = true;
+        winnerTeam = "B";
+        finishedAt = new Date().toISOString();
+      }
+    }
+
+    // Check if max rounds is reached
+    if (
+      game.settings.maxRounds &&
+      game.rounds.length + 1 >= game.settings.maxRounds &&
+      !isFinished
+    ) {
+      isFinished = true;
+      finishedAt = new Date().toISOString();
+      if (newTotalA > newTotalB) {
+        winnerTeam = "A";
+      } else if (newTotalB > newTotalA) {
+        winnerTeam = "B";
+      }
+      // If tied, no winner is set
+    }
+
     return {
       ...game,
       rounds: [...game.rounds, newRound],
       totalScoreTeamA: newTotalA,
       totalScoreTeamB: newTotalB,
+      isFinished,
+      winnerTeam,
+      finishedAt,
     };
   });
 }

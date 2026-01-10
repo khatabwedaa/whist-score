@@ -46,8 +46,23 @@ export default function AddRoundScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      loadGame();
-    }, [loadGame])
+      let isActive = true;
+
+      const fetchGame = async () => {
+        if (!id) return;
+        const loaded = await getGame(id);
+        if (isActive && loaded) {
+          setGame(loaded);
+          setBid(loaded.settings.minBid);
+        }
+      };
+
+      fetchGame();
+
+      return () => {
+        isActive = false;
+      };
+    }, [id])
   );
 
   if (!game) {
@@ -85,6 +100,11 @@ export default function AddRoundScreen() {
   const handleTricksTeamAChange = (value: number) => {
     setTricksTeamA(value);
     setTricksTeamB(TOTAL_TRICKS - value);
+  };
+
+  const handleTricksTeamBChange = (value: number) => {
+    setTricksTeamB(value);
+    setTricksTeamA(TOTAL_TRICKS - value);
   };
 
   const handleSave = async () => {
@@ -200,8 +220,13 @@ export default function AddRoundScreen() {
             </View>
             <View style={styles.tricksColumn}>
               <Text style={styles.tricksTeamLabel}>{t("them")}</Text>
-              <View style={styles.tricksValueBox}>
-                <Text style={styles.tricksValueText}>{tricksTeamB}</Text>
+              <View style={styles.pickerContainer}>
+                <ScrollPicker
+                  value={tricksTeamB}
+                  onChange={handleTricksTeamBChange}
+                  min={0}
+                  max={TOTAL_TRICKS}
+                />
               </View>
             </View>
           </View>
@@ -324,20 +349,20 @@ const styles = StyleSheet.create({
   teamSelector: {
     flexDirection: "row",
     backgroundColor: colors.surface.secondary,
-    borderRadius: 12,
+    borderRadius: 30,
     padding: 4,
   },
   teamBtn: {
     flex: 1,
     paddingVertical: spacing.md,
-    borderRadius: 10,
+    borderRadius: 26,
     alignItems: "center",
   },
   teamBtnActiveA: {
     backgroundColor: "#16a34a",
   },
   teamBtnActiveB: {
-    backgroundColor: "#dc2626",
+    backgroundColor: "#f59e0b",
   },
   teamBtnText: {
     fontSize: typography.size.lg,
@@ -379,10 +404,10 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   tricksValueBox: {
-    width: 80,
-    height: 80,
+    width: 100,
+    height: 100,
     backgroundColor: colors.surface.secondary,
-    borderRadius: 12,
+    borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -395,7 +420,7 @@ const styles = StyleSheet.create({
   // Preview
   previewSection: {
     backgroundColor: colors.surface.secondary,
-    borderRadius: 16,
+    borderRadius: 24,
     padding: spacing.lg,
     marginTop: spacing.md,
   },
@@ -438,9 +463,9 @@ const styles = StyleSheet.create({
     borderTopColor: colors.border.primary,
   },
   saveBtn: {
-    backgroundColor: "#dc2626",
+    backgroundColor: "#0ea5e9",
     paddingVertical: spacing.lg,
-    borderRadius: 16,
+    borderRadius: 30,
     alignItems: "center",
   },
   saveBtnDisabled: {

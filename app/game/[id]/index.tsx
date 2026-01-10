@@ -6,6 +6,7 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
   Alert,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
@@ -32,17 +33,49 @@ export default function GameDetailScreen() {
   const { refreshGames } = useGames();
 
   const [game, setGame] = useState<Game | null>(null);
+  const [showGameOverModal, setShowGameOverModal] = useState(false);
 
   const loadGame = useCallback(async () => {
     if (!id) return;
     const loaded = await getGame(id);
-    setGame(loaded);
+    setGame((prevGame) => {
+      // Show game over modal when game just became finished
+      if (loaded && loaded.isFinished && prevGame && !prevGame.isFinished) {
+        setShowGameOverModal(true);
+      }
+      return loaded;
+    });
   }, [id]);
 
   useFocusEffect(
     useCallback(() => {
-      loadGame();
-    }, [loadGame])
+      let isActive = true;
+
+      const fetchGame = async () => {
+        if (!id) return;
+        const loaded = await getGame(id);
+        if (isActive) {
+          setGame((prevGame) => {
+            // Show game over modal when game just became finished
+            if (
+              loaded &&
+              loaded.isFinished &&
+              prevGame &&
+              !prevGame.isFinished
+            ) {
+              setShowGameOverModal(true);
+            }
+            return loaded;
+          });
+        }
+      };
+
+      fetchGame();
+
+      return () => {
+        isActive = false;
+      };
+    }, [id])
   );
 
   if (!game) {
@@ -107,8 +140,72 @@ export default function GameDetailScreen() {
     router.push("/new-game");
   };
 
+  const winnerTeamName =
+    game.winnerTeam === "A"
+      ? game.teamAName || t("us")
+      : game.winnerTeam === "B"
+      ? game.teamBName || t("them")
+      : null;
+
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
+      {/* Game Over Modal */}
+      <Modal
+        visible={showGameOverModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowGameOverModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalEmoji}>🏆</Text>
+            <Text style={styles.modalTitle}>{t("gameOver")}</Text>
+            {winnerTeamName ? (
+              <Text style={styles.modalWinner}>
+                {t("teamWins", { team: winnerTeamName })}
+              </Text>
+            ) : (
+              <Text style={styles.modalWinner}>{t("finished")}</Text>
+            )}
+            <View style={styles.modalScores}>
+              <View style={styles.modalScoreItem}>
+                <Text style={styles.modalTeamName}>
+                  {game.teamAName || t("us")}
+                </Text>
+                <Text
+                  style={[
+                    styles.modalScore,
+                    game.winnerTeam === "A" && styles.modalScoreWinner,
+                  ]}
+                >
+                  {game.totalScoreTeamA}
+                </Text>
+              </View>
+              <Text style={styles.modalVs}>-</Text>
+              <View style={styles.modalScoreItem}>
+                <Text style={styles.modalTeamName}>
+                  {game.teamBName || t("them")}
+                </Text>
+                <Text
+                  style={[
+                    styles.modalScore,
+                    game.winnerTeam === "B" && styles.modalScoreWinner,
+                  ]}
+                >
+                  {game.totalScoreTeamB}
+                </Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setShowGameOverModal(false)}
+            >
+              <Text style={styles.modalButtonText}>{t("ok")}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.closeBtn}>
@@ -393,9 +490,9 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
   },
   scoreBox: {
-    width: 120,
-    height: 100,
-    borderRadius: 16,
+    width: 110,
+    height: 110,
+    borderRadius: 55,
     backgroundColor: colors.surface.secondary,
     alignItems: "center",
     justifyContent: "center",
@@ -564,10 +661,10 @@ const styles = StyleSheet.create({
   },
   calculateBtn: {
     flex: 1,
-    backgroundColor: "#dc2626",
+    backgroundColor: "#0ea5e9",
     paddingVertical: spacing.lg,
     paddingHorizontal: spacing.xl,
-    borderRadius: 16,
+    borderRadius: 30,
     alignItems: "center",
   },
   calculateBtnText: {
@@ -593,13 +690,84 @@ const styles = StyleSheet.create({
   },
   primaryBtn: {
     flex: 1,
-    backgroundColor: "#dc2626",
+    backgroundColor: "#0ea5e9",
     paddingVertical: spacing.md,
-    borderRadius: 12,
+    borderRadius: 24,
     alignItems: "center",
   },
   primaryBtnText: {
     fontSize: typography.size.base,
+    fontWeight: typography.weight.bold,
+    color: "#ffffff",
+  },
+
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: spacing.xl,
+  },
+  modalContent: {
+    backgroundColor: colors.surface.primary,
+    borderRadius: 24,
+    padding: spacing.xl,
+    alignItems: "center",
+    width: "100%",
+    maxWidth: 320,
+  },
+  modalEmoji: {
+    fontSize: 64,
+    marginBottom: spacing.md,
+  },
+  modalTitle: {
+    fontSize: typography.size["2xl"],
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
+    marginBottom: spacing.sm,
+  },
+  modalWinner: {
+    fontSize: typography.size.xl,
+    fontWeight: typography.weight.semibold,
+    color: "#22c55e",
+    marginBottom: spacing.lg,
+  },
+  modalScores: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.lg,
+    marginBottom: spacing.xl,
+  },
+  modalScoreItem: {
+    alignItems: "center",
+  },
+  modalTeamName: {
+    fontSize: typography.size.base,
+    color: colors.text.secondary,
+    marginBottom: spacing.xs,
+  },
+  modalScore: {
+    fontSize: typography.size["3xl"],
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
+  },
+  modalScoreWinner: {
+    color: "#22c55e",
+  },
+  modalVs: {
+    fontSize: typography.size.xl,
+    color: colors.text.muted,
+  },
+  modalButton: {
+    backgroundColor: "#0ea5e9",
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xxxl,
+    borderRadius: 24,
+  },
+  modalButtonText: {
+    fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
     color: "#ffffff",
   },

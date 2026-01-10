@@ -69,8 +69,31 @@ export default function EditRoundScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      loadGame();
-    }, [loadGame])
+      let isActive = true;
+
+      const fetchData = async () => {
+        if (!id || !roundId) return;
+        const loaded = await getGame(id);
+
+        if (isActive && loaded) {
+          setGame(loaded);
+          const foundRound = loaded.rounds.find((r) => r.id === roundId);
+          if (foundRound) {
+            setRound(foundRound);
+            setDeclarerTeam(foundRound.declarerTeam);
+            setBid(foundRound.bid);
+            setTricksTeamA(foundRound.tricksTeamA);
+            setTricksTeamB(foundRound.tricksTeamB);
+          }
+        }
+      };
+
+      fetchData();
+
+      return () => {
+        isActive = false;
+      };
+    }, [id, roundId])
   );
 
   if (!game || !round) {

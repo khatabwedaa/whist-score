@@ -58,15 +58,23 @@ const translations = {
   deleteGameConfirm: "متأكد عايز تحذف اللعبة دي؟",
 
   // Rounds
-  round: "صكة",
-  rounds: "الصكات",
-  addRound: "أضف صكة",
-  editRound: "عدل الصكة",
-  deleteRound: "احذف الصكة",
-  deleteRoundConfirm: "متأكد عايز تحذف الصكة دي؟",
-  noRounds: "ما في صكات",
-  noRoundsDescription: "أضف صكة عشان تبدأ تحسب النقاط",
-  roundNumber: "الصكة {{number}}",
+  round: "شوته",
+  rounds: "الشوتات",
+  addRound: "أضف شوته",
+  editRound: "عدل الشوته",
+  deleteRound: "احذف الشوته",
+  deleteRoundConfirm: "متأكد عايز تحذف الشوته دي؟",
+  noRounds: "ما في شوتات",
+  noRoundsDescription: "أضف شوته عشان تبدأ تحسب النقاط",
+  roundNumber: "الشوته {{number}}",
+  maxRounds: "عدد الشوتات",
+  maxRoundsDescription: "عدد الشوتات في اللعبة (افتح للعبة بدون حد)",
+  unlimitedRounds: "بدون حد",
+
+  // Game Over
+  gameOver: "انتهت اللعبة",
+  teamWins: "{{team}} فاز!",
+  vs: "ضد",
 
   // Scoring
   score: "نقطة",
@@ -90,7 +98,7 @@ const translations = {
   statistics: "الإحصائيات",
   wins: "الإنتصارات",
   losses: "الهزائم",
-  totalRounds: "مجموع الصكات",
+  totalRounds: "مجموع الشوتات",
   overallLevel: "المستوى العام",
   beginner: "مبتدئ",
   amateur: "هاوي",

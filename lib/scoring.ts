@@ -39,8 +39,8 @@ export function calculateRoundScore(
   const bidMet = declarerTricks >= bid;
 
   if (bidMet) {
-    // Declarer succeeded: gains the bid amount
-    declarerScore = bid;
+    // Declarer succeeded: gains the tricks they won (not just the bid)
+    declarerScore = declarerTricks;
     opponentScore = 0;
   } else {
     // Declarer failed: loses bid, opponent gains based on failMode
