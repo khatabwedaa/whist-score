@@ -1,5 +1,5 @@
 /**
- * West Score - Score Display Component
+ * Whist Score - Score Display Component
  * Big, prominent score display for teams
  */
 

@@ -1,5 +1,5 @@
 /**
- * Generate West Score App Icon
+ * Generate Whist Score App Icon
  * Ford-style simple elegant typography - "W" on dark navy background
  */
 

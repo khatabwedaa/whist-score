@@ -1,5 +1,5 @@
 /**
- * West Score - Arabic Translations (Arabic Only)
+ * Whist Score - Arabic Translations (Arabic Only)
  * اللهجة السودانية
  */
 

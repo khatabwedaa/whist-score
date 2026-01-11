@@ -59,7 +59,7 @@ The app supports three scoring modes when the declarer fails:
 
    ```bash
    git clone <repository-url>
-   cd west-score
+   cd whist-score
    ```
 
 2. **Install dependencies**
@@ -92,7 +92,7 @@ The app supports three scoring modes when the declarer fails:
 ## 📁 Project Structure
 
 ```
-west-score/
+whist-score/
 ├── app/                    # Expo Router screens
 │   ├── _layout.tsx         # Root layout
 │   ├── index.tsx           # Home screen (game list)
@@ -271,7 +271,7 @@ interface GameSettings {
 
 ### App Configuration (`app.json`)
 
-- **Bundle ID**: `com.westscore.app`
+- **Bundle ID**: `com.whistscore.app`
 - **Theme**: Dark mode (`userInterfaceStyle: "dark"`)
 - **Orientation**: Portrait only
 - **New Architecture**: Enabled

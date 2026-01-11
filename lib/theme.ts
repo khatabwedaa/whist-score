@@ -1,5 +1,5 @@
 /**
- * West Score - Design System
+ * Whist Score - Design System
  * Tailwind-inspired color palette and typography
  */
 

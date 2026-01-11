@@ -1,5 +1,5 @@
 /**
- * West Score - Header Component
+ * Whist Score - Header Component
  */
 
 import React from "react";

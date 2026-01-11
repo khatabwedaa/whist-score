@@ -1,5 +1,5 @@
 /**
- * West Score - Empty State Component
+ * Whist Score - Empty State Component
  */
 
 import React from "react";

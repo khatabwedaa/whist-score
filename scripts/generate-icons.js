@@ -1,5 +1,5 @@
 /**
- * Generate App Icons for West Score
+ * Generate App Icons for Whist Score
  * Creates icon.png, adaptive-icon.png, favicon.png, and splash-icon.png
  * with the Ford-style cursive "W" design
  */
@@ -225,7 +225,7 @@ const icons = [
   },
 ];
 
-console.log("🎨 Generating West Score app icons...\n");
+console.log("🎨 Generating Whist Score app icons...\n");
 
 icons.forEach(({ name, svg, description }) => {
   const filePath = path.join(assetsDir, name);

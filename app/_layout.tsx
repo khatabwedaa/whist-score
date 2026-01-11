@@ -1,5 +1,5 @@
 /**
- * West Score - Root Layout
+ * Whist Score - Root Layout
  * Arabic-only app with RTL support
  */
 

@@ -1,5 +1,5 @@
 /**
- * West Score - Segmented Control Component
+ * Whist Score - Segmented Control Component
  * For selecting between teams or options
  */
 

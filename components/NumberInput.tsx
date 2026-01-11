@@ -1,5 +1,5 @@
 /**
- * West Score - Number Input Component
+ * Whist Score - Number Input Component
  * For entering numeric values like bids and tricks
  */
 

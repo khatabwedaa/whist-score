@@ -1,5 +1,5 @@
 /**
- * West Score - Game Stack Layout
+ * Whist Score - Game Stack Layout
  */
 
 import { Stack } from "expo-router";

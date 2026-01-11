@@ -1,5 +1,5 @@
 /**
- * West Score - Context Providers
+ * Whist Score - Context Providers
  * Global state management for games (Arabic only, always RTL)
  */
 

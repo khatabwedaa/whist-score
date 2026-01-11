@@ -1,5 +1,5 @@
 /**
- * West Score - Game Card Component
+ * Whist Score - Game Card Component
  * Displays a game in the games list
  */
 

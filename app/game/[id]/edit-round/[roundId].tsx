@@ -1,5 +1,5 @@
 /**
- * West Score - Edit Round Screen
+ * Whist Score - Edit Round Screen
  */
 
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";

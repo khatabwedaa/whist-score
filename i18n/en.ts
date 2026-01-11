@@ -1,10 +1,10 @@
 /**
- * West Score - English Translations
+ * Whist Score - English Translations
  */
 
 export const en = {
   // App
-  appName: "West Score",
+  appName: "Whist Score",
   appTagline: "Sudanese Whist Score Tracker",
 
   // Common
@@ -134,7 +134,7 @@ export const en = {
   about: "About",
   version: "Version",
   aboutDescription:
-    "West Score is a digital scorebook for the Sudanese card game Whist (ويست). Track scores, save games, and enjoy playing!",
+    "Whist Score is a digital scorebook for the Sudanese card game Whist (ويست). Track scores, save games, and enjoy playing!",
 } as const;
 
 export type TranslationKey = keyof typeof en;

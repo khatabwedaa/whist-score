@@ -1,5 +1,5 @@
 /**
- * West Score - Library Index
+ * Whist Score - Library Index
  */
 
 export * from "./context";

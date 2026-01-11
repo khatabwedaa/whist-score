@@ -1,5 +1,5 @@
 /**
- * West Score - Round Row Component
+ * Whist Score - Round Row Component
  * Displays a single round in the game history
  */
 

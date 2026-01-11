@@ -1,5 +1,5 @@
 /**
- * West Score - Card Component
+ * Whist Score - Card Component
  */
 
 import React from "react";

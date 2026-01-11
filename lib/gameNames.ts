@@ -1,6 +1,6 @@
 /**
- * West Score - Game Name Generator
- * Generates fun, random game names for West games
+ * Whist Score - Game Name Generator
+ * Generates fun, random game names for Whist games
  */
 
 // Funny game names in Sudanese Arabic

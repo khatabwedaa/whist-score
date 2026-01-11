@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.westscore.app"
+      "bundleIdentifier": "com.whistscore.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -24,7 +24,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.westscore.app"
+      "package": "com.whistscore.app"
     },
     "web": {
       "favicon": "./assets/favicon.png",
