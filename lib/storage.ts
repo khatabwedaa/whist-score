@@ -241,11 +241,51 @@ export async function updateRound(
     const totalScoreTeamA = newRounds.reduce((sum, r) => sum + r.scoreTeamA, 0);
     const totalScoreTeamB = newRounds.reduce((sum, r) => sum + r.scoreTeamB, 0);
 
+    // Recalculate game finished state
+    let isFinished = false;
+    let winnerTeam: "A" | "B" | undefined = undefined;
+    let finishedAt: string | undefined = undefined;
+
+    if (game.settings.targetScore) {
+      if (
+        totalScoreTeamA >= game.settings.targetScore &&
+        totalScoreTeamA > totalScoreTeamB
+      ) {
+        isFinished = true;
+        winnerTeam = "A";
+        finishedAt = game.finishedAt || new Date().toISOString();
+      } else if (
+        totalScoreTeamB >= game.settings.targetScore &&
+        totalScoreTeamB > totalScoreTeamA
+      ) {
+        isFinished = true;
+        winnerTeam = "B";
+        finishedAt = game.finishedAt || new Date().toISOString();
+      }
+    }
+
+    if (
+      !isFinished &&
+      game.settings.maxRounds &&
+      newRounds.length >= game.settings.maxRounds
+    ) {
+      isFinished = true;
+      finishedAt = game.finishedAt || new Date().toISOString();
+      if (totalScoreTeamA > totalScoreTeamB) {
+        winnerTeam = "A";
+      } else if (totalScoreTeamB > totalScoreTeamA) {
+        winnerTeam = "B";
+      }
+    }
+
     return {
       ...game,
       rounds: newRounds,
       totalScoreTeamA,
       totalScoreTeamB,
+      isFinished,
+      winnerTeam,
+      finishedAt,
     };
   });
 }
@@ -265,11 +305,51 @@ export async function deleteRound(
     const totalScoreTeamA = newRounds.reduce((sum, r) => sum + r.scoreTeamA, 0);
     const totalScoreTeamB = newRounds.reduce((sum, r) => sum + r.scoreTeamB, 0);
 
+    // Recalculate game finished state
+    let isFinished = false;
+    let winnerTeam: "A" | "B" | undefined = undefined;
+    let finishedAt: string | undefined = undefined;
+
+    if (game.settings.targetScore) {
+      if (
+        totalScoreTeamA >= game.settings.targetScore &&
+        totalScoreTeamA > totalScoreTeamB
+      ) {
+        isFinished = true;
+        winnerTeam = "A";
+        finishedAt = game.finishedAt;
+      } else if (
+        totalScoreTeamB >= game.settings.targetScore &&
+        totalScoreTeamB > totalScoreTeamA
+      ) {
+        isFinished = true;
+        winnerTeam = "B";
+        finishedAt = game.finishedAt;
+      }
+    }
+
+    if (
+      !isFinished &&
+      game.settings.maxRounds &&
+      newRounds.length >= game.settings.maxRounds
+    ) {
+      isFinished = true;
+      finishedAt = game.finishedAt;
+      if (totalScoreTeamA > totalScoreTeamB) {
+        winnerTeam = "A";
+      } else if (totalScoreTeamB > totalScoreTeamA) {
+        winnerTeam = "B";
+      }
+    }
+
     return {
       ...game,
       rounds: newRounds,
       totalScoreTeamA,
       totalScoreTeamB,
+      isFinished,
+      winnerTeam,
+      finishedAt,
     };
   });
 }
@@ -328,11 +408,20 @@ export async function updateGameSettings(
  * Mark a game as finished
  */
 export async function finishGame(gameId: string): Promise<Game> {
-  return updateGame(gameId, (game) => ({
-    ...game,
-    isFinished: true,
-    finishedAt: new Date().toISOString(),
-  }));
+  return updateGame(gameId, (game) => {
+    let winnerTeam: "A" | "B" | undefined = undefined;
+    if (game.totalScoreTeamA > game.totalScoreTeamB) {
+      winnerTeam = "A";
+    } else if (game.totalScoreTeamB > game.totalScoreTeamA) {
+      winnerTeam = "B";
+    }
+    return {
+      ...game,
+      isFinished: true,
+      finishedAt: new Date().toISOString(),
+      winnerTeam,
+    };
+  });
 }
 
 /**
@@ -343,6 +432,7 @@ export async function reopenGame(gameId: string): Promise<Game> {
     ...game,
     isFinished: false,
     finishedAt: undefined,
+    winnerTeam: undefined,
   }));
 }
 
@@ -359,11 +449,53 @@ export async function undoLastRound(gameId: string): Promise<Game> {
     const totalScoreTeamA = newRounds.reduce((sum, r) => sum + r.scoreTeamA, 0);
     const totalScoreTeamB = newRounds.reduce((sum, r) => sum + r.scoreTeamB, 0);
 
+    // Check if game should still be finished after undo
+    let isFinished = false;
+    let winnerTeam: "A" | "B" | undefined = undefined;
+    let finishedAt: string | undefined = undefined;
+
+    // Check target score
+    if (game.settings.targetScore) {
+      if (
+        totalScoreTeamA >= game.settings.targetScore &&
+        totalScoreTeamA > totalScoreTeamB
+      ) {
+        isFinished = true;
+        winnerTeam = "A";
+        finishedAt = game.finishedAt;
+      } else if (
+        totalScoreTeamB >= game.settings.targetScore &&
+        totalScoreTeamB > totalScoreTeamA
+      ) {
+        isFinished = true;
+        winnerTeam = "B";
+        finishedAt = game.finishedAt;
+      }
+    }
+
+    // Check max rounds (only if not already finished by target score)
+    if (
+      !isFinished &&
+      game.settings.maxRounds &&
+      newRounds.length >= game.settings.maxRounds
+    ) {
+      isFinished = true;
+      finishedAt = game.finishedAt;
+      if (totalScoreTeamA > totalScoreTeamB) {
+        winnerTeam = "A";
+      } else if (totalScoreTeamB > totalScoreTeamA) {
+        winnerTeam = "B";
+      }
+    }
+
     return {
       ...game,
       rounds: newRounds,
       totalScoreTeamA,
       totalScoreTeamB,
+      isFinished,
+      winnerTeam,
+      finishedAt,
     };
   });
 }
